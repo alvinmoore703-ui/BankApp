@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">Welcome {{ user.username }}</h2>
+
+<div class="grid grid-cols-3 gap-4 mb-4">
+<div class="bg-white p-4 shadow">Balance £{{ user.balance }}</div>
+<div class="bg-white p-4 shadow">Daily Limit £{{ daily_limit }}</div>
+<div class="bg-white p-4 shadow">Status Active</div>
+</div>
+
+<form action="/send" method="post" class="bg-white p-4 shadow mb-4">
+<select name="to_user" class="border p-2">
+{% for u in users %}<option value="{{u.id}}">{{u.username}}</option>{% endfor %}
+</select>
+<input name="amount" class="border p-2" placeholder="Amount">
+<button class="bg-blue-700 text-white px-4 py-2">Send</button>
+</form>
+
+<table class="w-full bg-white shadow">
+<tr><th>Date</th><th>Amount</th><th>Status</th><th>Risk</th></tr>
+{% for t in transactions %}
+<tr>
+<td>{{t.date}}</td>
+<td>£{{t.amount}}</td>
+<td>{{t.status}}</td>
+<td>{{t.risk_score}}</td>
+</tr>
+{% endfor %}
+</table>
+
+<a href="/statement" class="text-blue-600">Download PDF Statement</a>
+{% endblock %}

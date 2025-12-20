@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-xl font-bold mb-4">Admin Panel</h2>
+<table class="bg-white w-full shadow">
+<tr><th>User</th><th>Amount</th><th>Risk</th><th>Action</th></tr>
+{% for t in flagged %}
+<tr>
+<td>{{t.username}}</td>
+<td>£{{t.amount}}</td>
+<td>{{t.risk_score}}</td>
+<td>
+<form action="/approve/{{t.id}}" method="post"><button>Approve</button></form>
+<form action="/reject/{{t.id}}" method="post"><button>Reject</button></form>
+</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}
