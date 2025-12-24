@@ -1,17 +1,58 @@
-<h2>Balance: {{ balance }}</h2>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard | Scotitrust-Bank</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
 
-<form action="/transfer" method="post">
-  <input name="to" placeholder="Send to">
-  <input name="amount" placeholder="Amount">
-  <button>Send</button>
-</form>
+<header class="nav">
+    <h1>Scotitrust-Bank</h1>
+    <a href="/logout">Logout</a>
+</header>
 
-<a href="/statement">Download PDF Statement</a>
+<section class="dashboard">
 
-<ul>
-{% for t in tx %}
-<li>{{ t[1] }} → {{ t[2] }} : {{ t[3] }} FLAG:{{ t[4] }}</li>
-{% endfor %}
-</ul>
+    <div class="card balance-card">
+        <h2>Account Balance</h2>
+        <p class="balance">₦{{ balance }}</p>
+        <small>Account No: {{ account_number }}</small>
+    </div>
 
-<a href="/logout">Logout</a>
+    <div class="card">
+        <h2>Transfer Funds</h2>
+        <form method="POST" action="/transfer">
+            <input name="to" placeholder="Recipient username" required>
+            <input name="amount" type="number" placeholder="Amount" required>
+            <button>Send Money</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Recent Transactions</h2>
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Amount</th>
+                <th>Ref</th>
+            </tr>
+            {% for t in tx %}
+            <tr>
+                <td>{{ t[5][:16] }}</td>
+                <td>{{ t[1] }}</td>
+                <td>{{ t[2] }}</td>
+                <td>₦{{ t[3] }}</td>
+                <td>{{ t[6] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <a href="/statement" class="btn">Download Statement</a>
+
+</section>
+
+</body>
+</html>
