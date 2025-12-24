@@ -1,2 +1,50 @@
-body { font-family: Arial; padding: 20px; }
-h1,h2 { color: #2c3e50; }
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    padding: 0;
+    margin: 0;
+    background: #F5F7FA;
+    color: #1E1E1E;
+}
+
+header {
+    background: #0A2A66;
+    color: white;
+    padding: 20px;
+}
+
+h1, h2 {
+    color: #0A2A66;
+}
+
+a {
+    color: #1ABC9C;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+button {
+    background: #0A2A66;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #081F4A;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.balance {
+    font-size: 28px;
+    font-weight: bold;
+    color: #1ABC9C;
+}
