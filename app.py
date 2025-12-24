@@ -49,8 +49,10 @@ def init_db():
 init_db()
 
 # ---------------- ROUTES ----------------
-@app.route("/", methods=["GET", "HEAD"])
+@app@app.route("/", methods=["GET", "HEAD"])
 def index():
+    if request.method == "HEAD":
+        return "", 200
     return render_template("index.html")
 
 @app.route("/register", methods=["GET","POST"])
