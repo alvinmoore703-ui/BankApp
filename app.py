@@ -38,6 +38,15 @@ def init_db():
         reference TEXT
     )
     """)
+    
+    c.execute("""
+CREATE TABLE IF NOT EXISTS otps (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    reference TEXT,
+    otp TEXT,
+    created_at TEXT
+)
+""")
 
     # Default admin
     c.execute("SELECT * FROM users WHERE username='admin'")
