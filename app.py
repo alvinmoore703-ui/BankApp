@@ -144,7 +144,7 @@ def transfer():
 
     conn.commit()
     conn.close()
-    return redirect("/dashboard")
+    return redirect("/dashboard?transfer=success")
 
 @app.route("/admin")
 def admin():
