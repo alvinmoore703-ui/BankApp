@@ -1,21 +1,62 @@
-@app.route("/dashboard")
-def dashboard():
-    if "user" not in session:
-        return redirect("/login")
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Scotitrust-Bank</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>Scotitrust-Bank Dashboard</h1>
+        <nav>
+            <a href="/statement">Download Statement</a> |
+            <a href="/logout">Logout</a>
+        </nav>
+    </header>
 
-    conn = sqlite3.connect(DB)
-    c = conn.cursor()
+    <section class="account-info">
+        <h2>Welcome, {{ session.user }}</h2>
+        <div class="card">
+            <p><strong>Account Number:</strong> {{ account_number }}</p>
+            <p><strong>Balance:</strong> ${{ balance }}</p>
+        </div>
+    </section>
 
-    # Get balance and account number
-    c.execute("SELECT balance, account_number FROM users WHERE username=?", (session["user"],))
-    user_info = c.fetchone()
-    balance = user_info[0]
-    account_number = user_info[1]
+    <section class="transfer">
+        <h2>Make a Transfer</h2>
+        <form action="/transfer" method="POST">
+            <input type="text" name="to" placeholder="Receiver Username" required>
+            <input type="number" name="amount" placeholder="Amount" step="0.01" required>
+            <button type="submit">Send Money</button>
+        </form>
+    </section>
 
-    # Get user transactions
-    c.execute("SELECT * FROM transactions WHERE sender=? OR receiver=?",
-              (session["user"], session["user"]))
-    tx = c.fetchall()
-    conn.close()
-
-    return render_template("dashboard.html", balance=balance, account_number=account_number, tx=tx)
+    <section class="transactions">
+        <h2>Your Transactions</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Sender</th>
+                    <th>Receiver</th>
+                    <th>Amount</th>
+                    <th>Flagged</th>
+                    <th>Reference</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in tx %}
+                <tr>
+                    <td>{{ t[1] }}</td>
+                    <td>{{ t[2] }}</td>
+                    <td>${{ t[3] }}</td>
+                    <td>{{ t[4] }}</td>
+                    <td>{{ t[6] }}</td>
+                    <td>{{ t[5] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</body>
+</html>
