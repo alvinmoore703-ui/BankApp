@@ -195,6 +195,14 @@ def transfer():
     return redirect("/verify-otp")
     
     return render_template("admin.html", tx=tx)
+    
+    msg = Message(
+    subject="Scotitrust-Bank OTP",
+    sender=app.config["MAIL_USERNAME"],
+    recipients=["user@email.com"],  # replace with user email later
+    body=f"Your OTP for transaction {reference} is {otp}"
+)
+mail.send(msg)
 
 @app.route("/statement")
 def statement():
