@@ -1,38 +1,48 @@
 body {
     font-family: "Segoe UI", Arial, sans-serif;
-    padding: 0;
-    margin: 0;
     background: #F5F7FA;
+    margin: 0;
     color: #1E1E1E;
 }
 
-header {
+.nav {
     background: #0A2A66;
     color: white;
-    padding: 20px;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-h1, h2 {
-    color: #0A2A66;
-}
-
-a {
-    color: #1ABC9C;
+.nav a {
+    color: white;
+    margin-left: 15px;
     text-decoration: none;
     font-weight: 600;
 }
 
-button {
-    background: #0A2A66;
-    color: white;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 6px;
-    cursor: pointer;
+.hero {
+    text-align: center;
+    padding: 80px 20px;
 }
 
-button:hover {
-    background: #081F4A;
+.btn {
+    background: #1ABC9C;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.btn.big {
+    padding: 14px 30px;
+    font-size: 18px;
+}
+
+.dashboard {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 20px;
 }
 
 .card {
@@ -44,7 +54,16 @@ button:hover {
 }
 
 .balance {
-    font-size: 28px;
-    font-weight: bold;
+    font-size: 32px;
     color: #1ABC9C;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
 }
