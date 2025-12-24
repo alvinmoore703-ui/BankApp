@@ -1,3 +1,4 @@
+/* General */
 body { 
     font-family: Arial, sans-serif; 
     background: #f4f4f4; 
@@ -6,7 +7,7 @@ body {
 }
 
 header {
-    background: #8B0000; /* dark red */
+    background: #8B0000; 
     color: #fff;
     padding: 20px;
     text-align: center;
@@ -18,10 +19,12 @@ header nav a {
     text-decoration: none;
 }
 
+/* Hero section */
 .hero {
     text-align: center;
     padding: 50px 20px;
-    background: #FFE599; /* light gold-ish */
+    background: url('../static/hero-bg.jpg') no-repeat center;
+    background-size: cover;
 }
 
 .hero h2 { color: #8B0000; }
@@ -33,11 +36,7 @@ header nav a {
     border-radius: 5px;
 }
 
-.features {
-    padding: 40px 20px;
-    text-align: center;
-}
-
+/* Cards */
 .card {
     background: #fff;
     padding: 20px;
@@ -47,6 +46,34 @@ header nav a {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
+/* Forms */
+.register-form, .transfer {
+    width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.register-form input, .transfer input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.register-form button, .transfer button {
+    width: 50%;
+    padding: 10px;
+    background: #8B0000;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Tables */
 table {
     width: 90%;
     margin: 20px auto;
@@ -67,11 +94,6 @@ table th {
     color: #fff;
 }
 
-button {
-    background: #8B0000;
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
+.admin-transactions tr {
+    background-color: #FFE5E5; /* flagged transactions highlight */
 }
