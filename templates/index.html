@@ -1,12 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bank App</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Scotitrust-Bank | Secure Digital Banking</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-<h1>Welcome to Bank App</h1>
-<a href="/login">Login</a> |
-<a href="/register">Register</a>
+
+<header class="nav">
+    <h1>Scotitrust-Bank</h1>
+    <div>
+        <a href="/login">Login</a>
+        <a href="/register" class="btn">Open Account</a>
+    </div>
+</header>
+
+<section class="hero">
+    <h2>Banking Built on Trust</h2>
+    <p>Secure digital banking • Fast transfers • Transparent records</p>
+    <a href="/register" class="btn big">Get Started</a>
+</section>
+
+<section class="features">
+    <div class="card">
+        <h3>🔒 Secure Accounts</h3>
+        <p>Encrypted passwords and session protection.</p>
+    </div>
+    <div class="card">
+        <h3>⚡ Instant Transfers</h3>
+        <p>Send money instantly between Scotitrust users.</p>
+    </div>
+    <div class="card">
+        <h3>📄 Bank Statements</h3>
+        <p>Download official PDF transaction statements.</p>
+    </div>
+</section>
+
+<footer>
+    © 2025 Scotitrust-Bank. All rights reserved.
+</footer>
+
 </body>
 </html>
