@@ -1,7 +1,22 @@
-# New code with account_number
-import random  # at the top of the file if not already imported
-account_number = str(random.randint(1000000000, 9999999999))  # 10-digit account
-c.execute(
-    "INSERT INTO users (username,password,balance,account_number) VALUES (?,?,1000,?)",
-    (u,p,account_number)
-)
+@app.route("/register", methods=["GET","POST"])
+def register():
+    if request.method == "POST":
+        import random
+        u = request.form["username"]
+        p = generate_password_hash(request.form["password"])
+        account_number = str(random.randint(1000000000, 9999999999))  # 10-digit account
+
+        try:
+            conn = sqlite3.connect(DB)
+            c = conn.cursor()
+            c.execute(
+                "INSERT INTO users (username,password,balance,account_number) VALUES (?,?,1000,?)",
+                (u,p,account_number)
+            )
+            conn.commit()
+            conn.close()
+            return redirect("/login")
+        except sqlite3.IntegrityError:
+            return "Username already exists or account number collision"
+
+    return render_template("register.html")
