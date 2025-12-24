@@ -3,35 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <title>Scotitrust-Bank</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <header>
-        <h1>Scotitrust-Bank</h1>
-        <nav>
-            <a href="/login">Login</a> |
-            <a href="/register">Register</a>
-        </nav>
-    </header>
 
-    <section class="hero">
-        <h2>Your trusted fintech bank</h2>
-        <p>Fast, secure, and easy-to-use banking at your fingertips.</p>
-        <a class="btn" href="/register">Get Started</a>
-    </section>
+<!-- Header -->
+<header>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Scotitrust-Bank Logo" width="120">
+    <h1>Scotitrust-Bank</h1>
+    <nav>
+        <a href="/login">Login</a> |
+        <a href="/register">Register</a>
+    </nav>
+</header>
 
-    <section class="features">
-        <h2>Features</h2>
-        <ul>
-            <li>Unique account numbers for all users</li>
-            <li>Instant transfers with transaction references</li>
-            <li>Flagged transactions monitoring for safety</li>
-            <li>Download account statements in PDF</li>
-        </ul>
-    </section>
+<!-- Hero Section -->
+<section class="hero">
+    <h2>Your trusted fintech bank</h2>
+    <p>Fast, secure, and easy-to-use banking at your fingertips.</p>
+    <a class="btn" href="/register">Get Started</a>
+</section>
 
-    <footer>
-        <p>© 2025 Scotitrust-Bank. All rights reserved.</p>
-    </footer>
+<!-- Features Section -->
+<section class="features">
+    <h2>Why Choose Scotitrust-Bank?</h2>
+    <div class="feature-cards">
+        <div class="feature-card">
+            <h3>Secure Accounts</h3>
+            <p>All accounts are protected with bank-grade encryption and secure login.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Instant Transfers</h3>
+            <p>Send and receive money quickly with unique transaction references.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Download Statements</h3>
+            <p>Get your account statements in PDF format anytime.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Admin Oversight</h3>
+            <p>Flagged transactions are monitored to keep your account safe.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p>© 2025 Scotitrust-Bank. All rights reserved.</p>
+</footer>
+
 </body>
 </html>
