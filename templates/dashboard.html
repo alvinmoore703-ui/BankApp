@@ -3,61 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard - Scotitrust-Bank</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <header>
-        <h1>Scotitrust-Bank Dashboard</h1>
-        <nav>
-            <a href="/statement">Download Statement</a> |
-            <a href="/logout">Logout</a>
-        </nav>
-    </header>
 
-    <section class="account-info">
-        <h2>Welcome, {{ session.user }}</h2>
-        <div class="card">
-            <p><strong>Account Number:</strong> {{ account_number }}</p>
-            <p><strong>Balance:</strong> ${{ balance }}</p>
-        </div>
-    </section>
+<header>
+    <h1>Scotitrust-Bank</h1>
+    <nav>
+        <a href="/statement">Download Statement</a> |
+        {% if session.get("admin") %}
+            <a href="/admin">Admin Panel</a> |
+        {% endif %}
+        <a href="/logout">Logout</a>
+    </nav>
+</header>
 
-    <section class="transfer">
-        <h2>Make a Transfer</h2>
-        <form action="/transfer" method="POST">
-            <input type="text" name="to" placeholder="Receiver Username" required>
-            <input type="number" name="amount" placeholder="Amount" step="0.01" required>
-            <button type="submit">Send Money</button>
-        </form>
-    </section>
+<!-- Account Summary -->
+<section class="card">
+    <h2>Welcome, {{ session["user"] }}</h2>
+    <p><strong>Account Number:</strong> {{ account_number }}</p>
+    <p><strong>Available Balance:</strong> ₦{{ balance }}</p>
+</section>
 
-    <section class="transactions">
-        <h2>Your Transactions</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Sender</th>
-                    <th>Receiver</th>
-                    <th>Amount</th>
-                    <th>Flagged</th>
-                    <th>Reference</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for t in tx %}
-                <tr>
-                    <td>{{ t[1] }}</td>
-                    <td>{{ t[2] }}</td>
-                    <td>${{ t[3] }}</td>
-                    <td>{{ t[4] }}</td>
-                    <td>{{ t[6] }}</td>
-                    <td>{{ t[5] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </section>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+<!-- Transfer Form -->
+<section class="transfer">
+    <h2>Transfer Funds</h2>
+    <form action="/transfer" method="POST">
+        <input type="text" name="to" placeholder="Receiver Username" required>
+        <input type="number" name="amount" placeholder="Amount" required>
+        <button type="submit">Send Money</button>
+    </form>
+</section>
+
+<!-- Transactions Table -->
+<section>
+    <h2 style="text-align:center;">Transaction History</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Sender</th>
+                <th>Receiver</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Reference</th>
+                <th>Flagged</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in tx %}
+            <tr>
+                <td>{{ t[1] }}</td>
+                <td>{{ t[2] }}</td>
+                <td>₦{{ t[3] }}</td>
+                <td>{{ t[5] }}</td>
+                <td>{{ t[6] }}</td>
+                <td>{{ "YES" if t[4] == 1 else "NO" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<footer>
+    <p>© 2025 Scotitrust-Bank. All rights reserved.</p>
+</footer>
+
+<!-- JavaScript -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
 </body>
 </html>
