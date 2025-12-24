@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session, send_file
-import sqlite3, os
+import sqlite3, os, random
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from fpdf import FPDF
@@ -14,16 +14,19 @@ def init_db():
     conn = sqlite3.connect(DB)
     c = conn.cursor()
 
+    # Users table with account numbers
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE,
         password TEXT,
         balance REAL DEFAULT 0,
-        is_admin INTEGER DEFAULT 0
+        is_admin INTEGER DEFAULT 0,
+        account_number TEXT UNIQUE
     )
     """)
 
+    # Transactions table with reference
     c.execute("""
     CREATE TABLE IF NOT EXISTS transactions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,16 +34,18 @@ def init_db():
         receiver TEXT,
         amount REAL,
         flagged INTEGER DEFAULT 0,
-        created_at TEXT
+        created_at TEXT,
+        reference TEXT
     )
     """)
 
-    # default admin
+    # Default admin
     c.execute("SELECT * FROM users WHERE username='admin'")
     if not c.fetchone():
+        admin_account = str(random.randint(1000000000, 9999999999))
         c.execute(
-            "INSERT INTO users (username, password, is_admin) VALUES (?,?,1)",
-            ("admin", generate_password_hash("admin123"))
+            "INSERT INTO users (username, password, is_admin, account_number) VALUES (?,?,1,?)",
+            ("admin", generate_password_hash("admin123"), admin_account)
         )
 
     conn.commit()
@@ -51,8 +56,6 @@ init_db()
 # ---------------- ROUTES ----------------
 @app.route("/", methods=["GET", "HEAD"])
 def index():
-    if request.method == "HEAD":
-        return "", 200
     return render_template("index.html")
 
 @app.route("/register", methods=["GET","POST"])
@@ -60,16 +63,20 @@ def register():
     if request.method == "POST":
         u = request.form["username"]
         p = generate_password_hash(request.form["password"])
+        account_number = str(random.randint(1000000000, 9999999999))
 
         try:
             conn = sqlite3.connect(DB)
             c = conn.cursor()
-            c.execute("INSERT INTO users (username,password,balance) VALUES (?,?,1000)", (u,p))
+            c.execute(
+                "INSERT INTO users (username,password,balance,account_number) VALUES (?,?,1000,?)",
+                (u,p,account_number)
+            )
             conn.commit()
             conn.close()
             return redirect("/login")
-        except:
-            return "Username already exists"
+        except sqlite3.IntegrityError:
+            return "Username already exists or account number collision"
 
     return render_template("register.html")
 
@@ -100,39 +107,39 @@ def dashboard():
 
     conn = sqlite3.connect(DB)
     c = conn.cursor()
-    c.execute("SELECT balance FROM users WHERE username=?", (session["user"],))
-    balance = c.fetchone()[0]
+    c.execute("SELECT balance, account_number FROM users WHERE username=?", (session["user"],))
+    user_info = c.fetchone()
+    balance = user_info[0]
+    account_number = user_info[1]
 
     c.execute("SELECT * FROM transactions WHERE sender=? OR receiver=?",
               (session["user"], session["user"]))
     tx = c.fetchall()
     conn.close()
 
-    return render_template("dashboard.html", balance=balance, tx=tx)
+    return render_template("dashboard.html", balance=balance, account_number=account_number, tx=tx)
 
 @app.route("/transfer", methods=["POST"])
 def transfer():
     sender = session["user"]
     receiver = request.form["to"]
     amount = float(request.form["amount"])
-
     flagged = 1 if amount > 5000 else 0
+    tx_ref = f"TX{random.randint(100000,999999)}"
 
     conn = sqlite3.connect(DB)
     c = conn.cursor()
-
     c.execute("SELECT balance FROM users WHERE username=?", (sender,))
     bal = c.fetchone()[0]
-
     if bal < amount:
         return "Insufficient funds"
 
     c.execute("UPDATE users SET balance=balance-? WHERE username=?", (amount,sender))
     c.execute("UPDATE users SET balance=balance+? WHERE username=?", (amount,receiver))
     c.execute("""INSERT INTO transactions 
-        (sender,receiver,amount,flagged,created_at)
-        VALUES (?,?,?,?,?)""",
-        (sender,receiver,amount,flagged,str(datetime.now()))
+        (sender,receiver,amount,flagged,created_at,reference)
+        VALUES (?,?,?,?,?,?)""",
+        (sender,receiver,amount,flagged,str(datetime.now()), tx_ref)
     )
 
     conn.commit()
@@ -168,7 +175,7 @@ def statement():
     pdf.cell(200,10,f"Statement for {user}",ln=True)
 
     for r in rows:
-        pdf.cell(200,8,f"{r[1]} → {r[2]} | {r[3]} | FLAG:{r[4]}",ln=True)
+        pdf.cell(200,8,f"{r[1]} → {r[2]} | {r[3]} | FLAG:{r[4]} | REF:{r[6]}",ln=True)
 
     path = f"{user}_statement.pdf"
     pdf.output(path)
