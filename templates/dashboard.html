@@ -1,58 +1,21 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard | Scotitrust-Bank</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
+@app.route("/dashboard")
+def dashboard():
+    if "user" not in session:
+        return redirect("/login")
 
-<header class="nav">
-    <h1>Scotitrust-Bank</h1>
-    <a href="/logout">Logout</a>
-</header>
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
 
-<section class="dashboard">
+    # Get balance and account number
+    c.execute("SELECT balance, account_number FROM users WHERE username=?", (session["user"],))
+    user_info = c.fetchone()
+    balance = user_info[0]
+    account_number = user_info[1]
 
-    <div class="card balance-card">
-        <h2>Account Balance</h2>
-        <p class="balance">₦{{ balance }}</p>
-        <small>Account No: {{ account_number }}</small>
-    </div>
+    # Get user transactions
+    c.execute("SELECT * FROM transactions WHERE sender=? OR receiver=?",
+              (session["user"], session["user"]))
+    tx = c.fetchall()
+    conn.close()
 
-    <div class="card">
-        <h2>Transfer Funds</h2>
-        <form method="POST" action="/transfer">
-            <input name="to" placeholder="Recipient username" required>
-            <input name="amount" type="number" placeholder="Amount" required>
-            <button>Send Money</button>
-        </form>
-    </div>
-
-    <div class="card">
-        <h2>Recent Transactions</h2>
-        <table>
-            <tr>
-                <th>Date</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Amount</th>
-                <th>Ref</th>
-            </tr>
-            {% for t in tx %}
-            <tr>
-                <td>{{ t[5][:16] }}</td>
-                <td>{{ t[1] }}</td>
-                <td>{{ t[2] }}</td>
-                <td>₦{{ t[3] }}</td>
-                <td>{{ t[6] }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-
-    <a href="/statement" class="btn">Download Statement</a>
-
-</section>
-
-</body>
-</html>
+    return render_template("dashboard.html", balance=balance, account_number=account_number, tx=tx)
