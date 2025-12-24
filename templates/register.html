@@ -1,5 +1,7 @@
-<form method="post">
-  <input name="username" placeholder="Username">
-  <input name="password" type="password" placeholder="Password">
-  <button>Register</button>
-</form>
+# New code with account_number
+import random  # at the top of the file if not already imported
+account_number = str(random.randint(1000000000, 9999999999))  # 10-digit account
+c.execute(
+    "INSERT INTO users (username,password,balance,account_number) VALUES (?,?,1000,?)",
+    (u,p,account_number)
+)
