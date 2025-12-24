@@ -127,31 +127,59 @@ def dashboard():
         tx=tx
     )
 
+@appimport random
+
 @app.route("/transfer", methods=["POST"])
 def transfer():
+    if "user" not in session:
+        return redirect("/login")
+
     sender = session["user"]
-    receiver = request.form["to"]
+    receiver_account = request.form["to_account"]
     amount = float(request.form["amount"])
+
     flagged = 1 if amount > 5000 else 0
-    tx_ref = f"TX{random.randint(100000,999999)}"
+    reference = f"TX{random.randint(10000000,99999999)}"
+    status = "PENDING"
 
     conn = sqlite3.connect(DB)
     c = conn.cursor()
-    c.execute("SELECT balance FROM users WHERE username=?", (sender,))
-    bal = c.fetchone()[0]
-    if bal < amount:
+
+    # Sender info
+    c.execute("SELECT balance, account_number FROM users WHERE username=?", (sender,))
+    sender_balance, sender_account = c.fetchone()
+
+    if sender_balance < amount:
+        conn.close()
         return "Insufficient funds"
 
-    c.execute("UPDATE users SET balance=balance-? WHERE username=?", (amount,sender))
-    c.execute("UPDATE users SET balance=balance+? WHERE username=?", (amount,receiver))
-    c.execute("""INSERT INTO transactions 
-        (sender,receiver,amount,flagged,created_at,reference)
-        VALUES (?,?,?,?,?,?)""",
-        (sender,receiver,amount,flagged,str(datetime.now()), tx_ref)
-    )
+    # Receiver lookup by ACCOUNT NUMBER
+    c.execute("SELECT username FROM users WHERE account_number=?", (receiver_account,))
+    receiver = c.fetchone()
+
+    if not receiver:
+        conn.close()
+        return "Invalid receiver account number"
+
+    receiver = receiver[0]
+
+    # Insert transaction as PENDING
+    c.execute("""
+        INSERT INTO transactions
+        (sender, receiver, amount, flagged, created_at, reference, status)
+        VALUES (?,?,?,?,?,?,?)
+    """, (
+        sender, receiver, amount, flagged,
+        str(datetime.now()), reference, status
+    ))
 
     conn.commit()
     conn.close()
+
+    # Go to OTP verification
+    session["pending_tx"] = reference
+    return redirect("/verify-otp")
+
     return redirect("/dashboard?transfer=success")
 
 @app.route("/admin")
