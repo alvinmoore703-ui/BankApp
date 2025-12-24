@@ -129,6 +129,8 @@ def dashboard():
 
 @appimport random
 
+@appimport random
+
 @app.route("/transfer", methods=["POST"])
 def transfer():
     if "user" not in session:
@@ -141,58 +143,48 @@ def transfer():
     flagged = 1 if amount > 5000 else 0
     reference = f"TX{random.randint(10000000,99999999)}"
     status = "PENDING"
+    otp = str(random.randint(100000, 999999))
 
     conn = sqlite3.connect(DB)
     c = conn.cursor()
 
-    # Sender info
-    c.execute("SELECT balance, account_number FROM users WHERE username=?", (sender,))
-    sender_balance, sender_account = c.fetchone()
-
-    if sender_balance < amount:
+    # Sender
+    c.execute("SELECT balance FROM users WHERE username=?", (sender,))
+    balance = c.fetchone()[0]
+    if balance < amount:
         conn.close()
         return "Insufficient funds"
 
-    # Receiver lookup by ACCOUNT NUMBER
+    # Receiver by account number
     c.execute("SELECT username FROM users WHERE account_number=?", (receiver_account,))
     receiver = c.fetchone()
-
     if not receiver:
         conn.close()
-        return "Invalid receiver account number"
+        return "Invalid account number"
 
     receiver = receiver[0]
 
-    # Insert transaction as PENDING
+    # Save transaction (PENDING)
     c.execute("""
         INSERT INTO transactions
         (sender, receiver, amount, flagged, created_at, reference, status)
         VALUES (?,?,?,?,?,?,?)
-    """, (
-        sender, receiver, amount, flagged,
-        str(datetime.now()), reference, status
-    ))
+    """, (sender, receiver, amount, flagged, str(datetime.now()), reference, status))
+
+    # Save OTP
+    c.execute("""
+        INSERT INTO otps (reference, otp, created_at)
+        VALUES (?,?,?)
+    """, (reference, otp, str(datetime.now())))
 
     conn.commit()
     conn.close()
 
-    # Go to OTP verification
     session["pending_tx"] = reference
+    session["otp"] = otp  # temporary (for email/demo)
+
     return redirect("/verify-otp")
-
-    return redirect("/dashboard?transfer=success")
-
-@app.route("/admin")
-def admin():
-    if not session.get("admin"):
-        return "Unauthorized"
-
-    conn = sqlite3.connect(DB)
-    c = conn.cursor()
-    c.execute("SELECT * FROM transactions WHERE flagged=1")
-    tx = c.fetchall()
-    conn.close()
-
+    
     return render_template("admin.html", tx=tx)
 
 @app.route("/statement")
