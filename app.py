@@ -100,24 +100,32 @@ def login():
 
     return render_template("login.html")
 
-@app.route("/dashboard")
+@app@app.route("/dashboard")
 def dashboard():
     if "user" not in session:
         return redirect("/login")
 
     conn = sqlite3.connect(DB)
     c = conn.cursor()
-    c.execute("SELECT balance, account_number FROM users WHERE username=?", (session["user"],))
-    user_info = c.fetchone()
-    balance = user_info[0]
-    account_number = user_info[1]
 
-    c.execute("SELECT * FROM transactions WHERE sender=? OR receiver=?",
-              (session["user"], session["user"]))
+    c.execute("SELECT balance, account_number FROM users WHERE username=?", (session["user"],))
+    balance, account_number = c.fetchone()
+
+    c.execute("""
+        SELECT * FROM transactions
+        WHERE sender=? OR receiver=?
+        ORDER BY id DESC
+    """, (session["user"], session["user"]))
     tx = c.fetchall()
+
     conn.close()
 
-    return render_template("dashboard.html", balance=balance, account_number=account_number, tx=tx)
+    return render_template(
+        "dashboard.html",
+        balance=balance,
+        account_number=account_number,
+        tx=tx
+    )
 
 @app.route("/transfer", methods=["POST"])
 def transfer():
