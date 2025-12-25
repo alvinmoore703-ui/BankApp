@@ -1,97 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body class="dark">
-<button onclick="toggle()">Toggle Theme</button>
-
-<div class="card">
-    <h2>Welcome {{ user.fullname }}</h2>
-    <p>Account Number: {{ user.account }}</p>
-    <p>Balance: ${{ user.balance }}</p>
-    <a href="/logout">Logout</a>
-</div>
-
-<script>
-function toggle(){
-    document.body.classList.toggle("dark");
-}
-</script>
-</body>
-</html>
-
-
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            header nav {
-                margin-top: 10px;
-            }
-
-            table, table th, table td {
-                font-size: 12px;
-            }
-        }
-    </style>
+  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/static/dashboard.css">
 </head>
 <body>
-    <header>
-        <h1>Scotitrust-Bank Dashboard</h1>
-        <nav>
-            <a href="/dashboard">Home</a>
-            <a href="/transfer">Transfer</a>
-            <a href="/logout">Logout</a>
-        </nav>
-    </header>
 
-    <div class="container">
-        <div class="account-info">
-            <h2>Account Information</h2>
-            <p><strong>Full Name:</strong> {{ user.full_name }}</p>
-            <p><strong>Username:</strong> {{ user.username }}</p>
-            <p><strong>Account Number:</strong> {{ user.account_number }}</p>
-            <p><strong>Balance:</strong> ${{ "%.2f"|format(user.balance) }}</p>
-        </div>
+<header class="dash-header">
+  <h2>Welcome, {{ user.full_name }}</h2>
+  <span class="account-type">{{ user.account_type }}</span>
+</header>
 
-        <h2>Recent Transactions</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Sender</th>
-                    <th>Receiver</th>
-                    <th>Amount</th>
-                    <th>Reference</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for t in transactions %}
-                <tr>
-                    <td>{{ t.created_at }}</td>
-                    <td>{{ t.sender }}</td>
-                    <td>{{ t.receiver }}</td>
-                    <td>${{ "%.2f"|format(t.amount) }}</td>
-                    <td>{{ t.reference }}</td>
-                    <td>
-                        {% if t.flagged == 1 %}
-                            <span class="status-flagged">FLAGGED</span>
-                        {% elif t.amount >= 500000 %}
-                            <span class="status-pending">PENDING</span>
-                        {% else %}
-                            <span class="status-success">SUCCESS</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<section class="balance-card">
+  <p>Available balance</p>
+  <h1>£{{ user.balance }}</h1>
+  <small>Account No: {{ user.account_number }}</small>
+</section>
+
+<section class="actions">
+  <a href="#">Send Money</a>
+  <a href="#">Transactions</a>
+  <a href="#">Statements</a>
+  <a href="#">Freeze Card</a>
+</section>
+
+<section class="transactions">
+  <h3>Recent activity</h3>
+  {% for tx in transactions %}
+    <div class="tx">
+      <span>{{ tx.reference }}</span>
+      <span>{{ tx.status }}</span>
+      <span>£{{ tx.amount }}</span>
     </div>
+  {% endfor %}
+</section>
+
+<nav class="bottom-nav">
+  <a>Home</a>
+  <a>Payments</a>
+  <a>Cards</a>
+  <a>Support</a>
+</nav>
+
 </body>
 </html>
-
