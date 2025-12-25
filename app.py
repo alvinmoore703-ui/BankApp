@@ -1,11 +1,22 @@
 import os
-from flask import Flask, render_template, request, redirect, session
-import sqlite3, os, random
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, render_template, request, redirect
+import sqlite3, random, os
+from werkzeug.security import generate_password_hash
+from flask_mail import Mail, Message
 from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "super-secret-key"
+
+# ---------------- MAIL CONFIG ----------------
+app.config.update(
+    MAIL_SERVER="smtp.gmail.com",
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USERNAME=os.environ.get("MAIL_USERNAME"),
+    MAIL_PASSWORD=os.environ.get("MAIL_PASSWORD")
+)
+mail = Mail(app)
 
 DB = "bank.db"
 
@@ -13,31 +24,29 @@ DB = "bank.db"
 def init_db():
     conn = sqlite3.connect(DB)
     c = conn.cursor()
-
     # Users table
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        fullname TEXT,
+        full_name TEXT,
         username TEXT UNIQUE,
         password TEXT,
         balance REAL DEFAULT 0,
-        account_number TEXT UNIQUE
+        is_admin INTEGER DEFAULT 0,
+        account_number TEXT UNIQUE,
+        email TEXT,
+        verified INTEGER DEFAULT 0
     )
     """)
-
-    # Transactions table
+    # OTP table
     c.execute("""
-    CREATE TABLE IF NOT EXISTS transactions (
+    CREATE TABLE IF NOT EXISTS otps (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        sender TEXT,
-        receiver TEXT,
-        amount REAL,
         reference TEXT,
+        otp TEXT,
         created_at TEXT
     )
     """)
-
     conn.commit()
     conn.close()
 
@@ -47,76 +56,49 @@ init_db()
 @app.route("/register", methods=["GET","POST"])
 def register():
     if request.method == "POST":
-        fullname = request.form["fullname"]
-        username = request.form["username"]
-        password = request.form["password"]
-        confirm_password = request.form["confirm_password"]
+        full_name = request.form.get("full_name")
+        username = request.form.get("username")
+        email = request.form.get("email")
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
 
         if password != confirm_password:
-            return "Passwords do not match"
+            return "Passwords do not match!"
 
         hashed_password = generate_password_hash(password)
-        account_number = str(random.randint(1000000000, 9999999999))
+        account_number = str(random.randint(1000000000, 9999999999))  # 10-digit
 
         try:
             conn = sqlite3.connect(DB)
             c = conn.cursor()
-            c.execute(
-                "INSERT INTO users (fullname, username, password, balance, account_number) VALUES (?,?,?,?,?)",
-                (fullname, username, hashed_password, 1000, account_number)
-            )
+            # Save user
+            c.execute("""
+                INSERT INTO users (full_name, username, password, balance, account_number, email)
+                VALUES (?,?,?,?,?,?)
+            """, (full_name, username, hashed_password, 1000, account_number, email))
+            conn.commit()
+
+            # Generate OTP
+            otp_code = str(random.randint(100000, 999999))
+            reference = f"REG-{random.randint(100000,999999)}"
+            c.execute("""
+                INSERT INTO otps (reference, otp, created_at) VALUES (?,?,?)
+            """, (reference, otp_code, str(datetime.now())))
             conn.commit()
             conn.close()
-            return redirect("/login")
+
+            # Send OTP email
+            msg = Message(
+                subject="Verify Your Scotitrust-Bank Account",
+                sender=app.config["MAIL_USERNAME"],
+                recipients=[email],
+                body=f"Hi {full_name}, your OTP to verify your Scotitrust-Bank account is: {otp_code}"
+            )
+            mail.send(msg)
+
+            return redirect(f"/verify_otp?ref={reference}&user={username}")
+
         except sqlite3.IntegrityError:
-            return "Username already exists or account number collision"
+            return "Username or email already exists, or account number collision!"
 
     return render_template("register.html")
-
-# ---------------- LOGIN ----------------
-@app.route("/login", methods=["GET","POST"])
-def login():
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-
-        conn = sqlite3.connect(DB)
-        c = conn.cursor()
-        c.execute("SELECT id, password FROM users WHERE username=?", (username,))
-        user = c.fetchone()
-        conn.close()
-
-        if user and check_password_hash(user[1], password):
-            session["user_id"] = user[0]
-            return redirect("/dashboard")
-        return "Invalid username or password"
-
-    return render_template("login.html")
-
-# ---------------- DASHBOARD ----------------
-@app.route("/dashboard")
-def dashboard():
-    if "user_id" not in session:
-        return redirect("/login")
-
-    conn = sqlite3.connect(DB)
-    c = conn.cursor()
-    c.execute("SELECT fullname, username, balance, account_number FROM users WHERE id=?", (session["user_id"],))
-    user = c.fetchone()
-    conn.close()
-
-    return render_template("dashboard.html", user=user)
-
-# ---------------- LOGOUT ----------------
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/login")
-
-# ---------------- HOME ----------------
-@app.route("/")
-def home():
-    return render_template("index.html")
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
