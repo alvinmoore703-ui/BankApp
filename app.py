@@ -19,8 +19,8 @@ app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 
 @app.route("/")
 def home():
-    return "Scotitrust Bank OK"
-    
+    return render_template("index.html")
+
 @app.route("/login")
 def login():
     return "Login page"
