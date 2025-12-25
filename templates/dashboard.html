@@ -2,66 +2,79 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard | Scotitrust-Bank</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <title>Dashboard - Scotitrust-Bank</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 
-<header class="topbar">
-    <h2>Scotitrust-Bank</h2>
-    <a href="/logout" class="logout">Logout</a>
+<header>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Scotitrust-Bank Logo" width="100">
+    <h1>Scotitrust-Bank</h1>
+    <nav>
+        <span>Welcome, {{ session['user'] }} | Account: {{ account_number }}</span>
+        <a href="/logout">Logout</a>
+    </nav>
 </header>
 
-<section class="account-card">
-    <h3>Welcome, {{ user[0] }}</h3>
-    <p><strong>Account Number:</strong> {{ user[2] }}</p>
-    <p class="balance">₦{{ "%.2f"|format(user[1]) }}</p>
+<section class="dashboard-overview">
+    <h2>Balance: ${{ balance }}</h2>
+    <button id="darkModeToggle">Toggle Dark Mode</button>
 </section>
 
-<section class="transfer-box">
-    <h3>Transfer Funds</h3>
+<section class="transfer">
+    <h2>Make a Transfer</h2>
     <form method="POST" action="/transfer">
-        <input type="text" name="receiver_account" placeholder="Receiver Account Number" required>
-        <input type="number" step="0.01" name="amount" placeholder="Amount" required>
-        <button type="submit">Send Money</button>
+        <input type="text" name="to" placeholder="Receiver Username" required>
+        <input type="number" name="amount" placeholder="Amount" required>
+        <button type="submit">Send</button>
     </form>
 </section>
 
 <section class="transactions">
-    <h3>Transaction History</h3>
-
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>From</th>
-                    <th>To</th>
-                    <th>Amount</th>
-                    <th>Reference</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for t in txns %}
-                <tr class="{{ 'flagged' if t[4] == 'FLAGGED' }}">
-                    <td>{{ t[0] }}</td>
-                    <td>{{ t[1] }}</td>
-                    <td>₦{{ t[2] }}</td>
-                    <td>{{ t[3] }}</td>
-                    <td class="{{ t[4]|lower }}">{{ t[4] }}</td>
-                    <td>{{ t[5][:19] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <a href="/statement" class="statement-btn">Download PDF Statement</a>
+    <h2>Transaction History</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Sender</th>
+                <th>Receiver</th>
+                <th>Amount</th>
+                <th>Flagged</th>
+                <th>Status</th>
+                <th>Reference</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in tx %}
+            <tr>
+                <td>{{ t[1] }}</td>
+                <td>{{ t[2] }}</td>
+                <td>${{ t[3] }}</td>
+                <td>{{ t[4] }}</td>
+                <td>{{ t[7] }}</td>
+                <td>{{ t[6] }}</td>
+                <td>{{ t[5] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </section>
 
+<section class="statement">
+    <a href="/statement" class="btn">Download PDF Statement</a>
+</section>
+
+<footer>
+    <p>© 2025 Scotitrust-Bank. All rights reserved.</p>
+</footer>
+
 <script src="{{ url_for('static', filename='script.js') }}"></script>
+<script>
+    document.getElementById('darkModeToggle').addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+    });
+</script>
+
 </body>
 </html>
