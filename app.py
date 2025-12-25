@@ -223,6 +223,13 @@ def transfer():
 
 status = "FLAGGED" if amount >= 500000 else "SUCCESS"
 
+msg = Message(
+    subject="Transaction Successful",
+    sender=app.config["MAIL_USERNAME"],
+    recipients=[user_email],  # replace with sender's email
+    body=f"Your transfer {tx_ref} was successful."
+)
+mail.send(msg)
     conn = sqlite3.connect(DB)
     c = conn.cursor()
 
