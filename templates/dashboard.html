@@ -1,24 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - Scotitrust-Bank</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scotitrust-Bank Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+
 <header>
-    <h1>Scotitrust-Bank Dashboard</h1>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Scotitrust-Bank Logo">
     <nav>
+        <a href="/dashboard">Dashboard</a>
         <a href="/logout">Logout</a>
     </nav>
 </header>
 
-<main>
-    <h2>Welcome, {{ user[0] }}</h2>
-    <p><strong>Username:</strong> {{ user[1] }}</p>
-    <p><strong>Account Number:</strong> {{ user[3] }}</p>
-    <p><strong>Balance:</strong> ${{ "%.2f"|format(user[2]) }}</p>
+<main class="dashboard">
+    <h1>Welcome, {{ user['full_name'] }}</h1>
+    
+    <section class="account-summary">
+        <div class="card">
+            <h2>Account Number</h2>
+            <p>{{ user['account_number'] }}</p>
+        </div>
+        <div class="card">
+            <h2>Current Balance</h2>
+            <p>${{ "%.2f"|format(user['balance']) }}</p>
+        </div>
+        <div class="card">
+            <h2>Account Type</h2>
+            <p>{{ user['account_type'] if user['account_type'] else 'Standard' }}</p>
+        </div>
+    </section>
+
+    <section class="transactions">
+        <h2>Recent Transactions</h2>
+        {% if transactions %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Reference</th>
+                    <th>Sender</th>
+                    <th>Receiver</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tx in transactions %}
+                <tr>
+                    <td>{{ tx['reference'] }}</td>
+                    <td>{{ tx['sender'] }}</td>
+                    <td>{{ tx['receiver'] }}</td>
+                    <td>${{ "%.2f"|format(tx['amount']) }}</td>
+                    <td>{{ tx['status'] }}</td>
+                    <td>{{ tx['created_at'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p>No transactions yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="actions">
+        <a href="/transfer" class="btn">Make a Transfer</a>
+        <a href="/statement" class="btn">Download Statement (PDF)</a>
+    </section>
 </main>
 
 <footer>
