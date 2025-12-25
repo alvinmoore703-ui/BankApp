@@ -1,6 +1,12 @@
-from flask import Flask
+import os
+import sqlite3
+import random
 
-app = Flask(__name__)
+from flask import Flask, render_template, request, redirect, session, send_file
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+from fpdf import FPDF
+from flask_mail import Mail, Message
 
 @app.route("/")
 def home():
