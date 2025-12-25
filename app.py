@@ -221,7 +221,7 @@ def transfer():
     receiver_account = request.form["receiver_account"]
     amount = float(request.form["amount"])
 
-status = "FLAGGED" if amount >= 500000 else "PENDING"
+status = "FLAGGED" if amount >= 500000 else "SUCCESS"
 
     conn = sqlite3.connect(DB)
     c = conn.cursor()
@@ -240,19 +240,8 @@ status = "FLAGGED" if amount >= 500000 else "PENDING"
 
     reference = generate_reference()
 
-    # create transaction (PENDING)
-    c.execute("""
-        INSERT INTO transactions 
-        (sender_account, receiver_account, amount, created_at, reference, status)
-        VALUES (?,?,?,?,?,?)
-    """, (
-        sender[0],
-        receiver_account,
-        amount,
-        datetime.now().isoformat(),
-        reference,
-        "PENDING"
-    ))
+    c.execute("""INSERT INTO transactions (sender, receiver, amount, flagged, created_at, reference, status)
+             VALUES (?, ?, ?, ?, ?, ?, ?)""", (sender, receiver, amount, flagged, str(datetime.now()), tx_ref, status))
 
     # generate OTP
     otp = generate_otp()
