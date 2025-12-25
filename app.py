@@ -221,6 +221,8 @@ def transfer():
     receiver_account = request.form["receiver_account"]
     amount = float(request.form["amount"])
 
+status = "FLAGGED" if amount >= 500000 else "PENDING"
+
     conn = sqlite3.connect(DB)
     c = conn.cursor()
 
