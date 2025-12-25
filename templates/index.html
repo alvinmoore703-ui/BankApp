@@ -1,28 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scotitrust-Bank</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <header>
+        <div class="logo-title">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Scotitrust-Bank Logo">
+            <h1>Scotitrust-Bank</h1>
+        </div>
+        <nav>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        </nav>
+    </header>
 
-<header>
-    <h1>Scotitrust-Bank</h1>
-    <p>Your trusted digital bank</p>
-    <nav>
-        <a href="/login">Login</a> |
-        <a href="/register">Open Account</a>
-    </nav>
-</header>
+    <section class="hero">
+        <h2>Your Trusted Fintech Bank</h2>
+        <p>Fast, secure, and easy-to-use banking at your fingertips.</p>
+        <a class="btn" href="/register">Get Started</a>
+    </section>
 
-<section>
-    <h2>Modern. Secure. Fast.</h2>
-    <p>Banking built for the future.</p>
-</section>
-
-<footer>
-    <p>© 2025 Scotitrust-Bank</p>
-</footer>
-
+    <footer>
+        &copy; 2025 Scotitrust-Bank | All Rights Reserved
+    </footer>
 </body>
 </html>
