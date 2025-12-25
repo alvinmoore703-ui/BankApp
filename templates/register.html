@@ -1,81 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scotitrust-Bank | Register</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        .register-container {
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            max-width: 400px;
-            width: 100%;
-        }
-
-        .register-container h2 {
-            text-align: center;
-            color: #8B0000; /* dark red */
-            margin-bottom: 30px;
-        }
-
-        .register-container form input {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        .register-container form button {
-            width: 100%;
-            padding: 12px;
-            background-color: #8B0000;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-
-        .register-container form button:hover {
-            background-color: #a00000;
-        }
-
-        .register-container .login-link {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        .register-container .login-link a {
-            color: #8B0000;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .register-container .login-link a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <title>Register</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="register-container">
-        <h2>Create Your Scotitrust-Bank Account</h2>
+<form class="card" method="POST">
+    <h2>Open an Account</h2>
+    <input name="fullname" placeholder="Full Name" required>
+    <input name="email" type="email" placeholder="Email" required>
+    <input name="password" type="password" placeholder="Password" required>
+    <input name="confirm" type="password" placeholder="Confirm Password" required>
+    <button>Create Account</button>
+</form>
+</body>
+</html>
+ust-Bank Account</h2>
         <form action="/register" method="POST">
             <input type="text" name="full_name" placeholder="Full Name" required>
             <input type="text" name="username" placeholder="Username" required>
