@@ -1,68 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Scotitrust-Bank</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Scotitrust-Bank</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <header>
-        <div class="logo-title">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Scotitrust-Bank Logo">
-            <h1>Scotitrust-Bank</h1>
-        </div>
-        <nav>
-            <a href="/logout">Logout</a>
-        </nav>
-    </header>
+<header>
+    <h1>Scotitrust-Bank Dashboard</h1>
+    <nav>
+        <a href="/logout">Logout</a>
+    </nav>
+</header>
 
-    <div class="dashboard-container">
-        <div class="dashboard-cards">
-            <div class="card">
-                <h3>Account Number</h3>
-                <p>{{ user.account_number }}</p>
-            </div>
-            <div class="card">
-                <h3>Balance</h3>
-                <p>${{ user.balance }}</p>
-            </div>
-            <div class="card">
-                <h3>Email</h3>
-                <p>{{ user.email }}</p>
-            </div>
-        </div>
+<main>
+    <h2>Welcome, {{ user[0] }}</h2>
+    <p><strong>Username:</strong> {{ user[1] }}</p>
+    <p><strong>Account Number:</strong> {{ user[3] }}</p>
+    <p><strong>Balance:</strong> ${{ "%.2f"|format(user[2]) }}</p>
+</main>
 
-        <h3>Recent Transactions</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Reference</th>
-                    <th>Sender</th>
-                    <th>Receiver</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for t in transactions %}
-                <tr>
-                    <td>{{ t.reference }}</td>
-                    <td>{{ t.sender }}</td>
-                    <td>{{ t.receiver }}</td>
-                    <td>${{ t.amount }}</td>
-                    <td class="status-{{ t.status|lower }}">{{ t.status }}</td>
-                    <td>{{ t.created_at }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <footer>
-        &copy; 2025 Scotitrust-Bank | All Rights Reserved
+<footer>
+    &copy; 2025 Scotitrust-Bank | All Rights Reserved
     </footer>
 </body>
 </html>
