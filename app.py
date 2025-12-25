@@ -1,58 +1,71 @@
-from flask import Flask, render_template, request, redirect, session, url_for
-import sqlite3
-import random
-import string
-from datetime import datetime
+from flask import Flask, render_template, request, redirect, session, send_file
+import sqlite3, os, random
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from datetime import datetime
+from fpdf import FPDF
 from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.secret_key = "super-secret-key"
 
-DB = "bank.db"
-
 # ---------------- MAIL CONFIG ----------------
-app.config["MAIL_SERVER"] = "smtp.gmail.com"
-app.config["MAIL_PORT"] = 587
-app.config["MAIL_USE_TLS"] = True
-app.config["MAIL_USERNAME"] = "your_email@gmail.com"
-app.config["MAIL_PASSWORD"] = "your_app_password"
-
+app.config.update(
+    MAIL_SERVER="smtp.gmail.com",
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USERNAME="your_email@gmail.com",
+    MAIL_PASSWORD="your_password"
+)
 mail = Mail(app)
+
+DB = "bank.db"
 
 # ---------------- DB INIT ----------------
 def init_db():
     conn = sqlite3.connect(DB)
     c = conn.cursor()
 
-    # USERS
+    # Users table
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE,
         password TEXT,
-        email TEXT,
         balance REAL DEFAULT 0,
         is_admin INTEGER DEFAULT 0,
-        account_number TEXT UNIQUE
+        account_number TEXT UNIQUE,
+        email TEXT
     )
     """)
 
-    # TRANSACTIONS
+    # Transactions table
     c.execute("""
     CREATE TABLE IF NOT EXISTS transactions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        sender_account TEXT,
-        receiver_account TEXT,
+        sender TEXT,
+        receiver TEXT,
         amount REAL,
+        flagged INTEGER DEFAULT 0,
         created_at TEXT,
         reference TEXT,
-        status TEXT DEFAULT 'PENDING'
+        status TEXT
     )
     """)
 
-    # OTPs
+    # KYC table
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS kyc (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        full_name TEXT,
+        dob TEXT,
+        address TEXT,
+        verified INTEGER DEFAULT 0,
+        created_at TEXT
+    )
+    """)
+
+    # OTP table
     c.execute("""
     CREATE TABLE IF NOT EXISTS otps (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -62,95 +75,63 @@ def init_db():
     )
     """)
 
-    @app.route("/admin")
-def admin():
-    if "user" not in session:
-        return redirect("/login")
+    # Default admin
+    c.execute("SELECT * FROM users WHERE username='admin'")
+    if not c.fetchone():
+        admin_account = str(random.randint(1000000000, 9999999999))
+        c.execute(
+            "INSERT INTO users (username, password, is_admin, account_number) VALUES (?,?,1,?)",
+            ("admin", generate_password_hash("admin123"), admin_account)
+        )
 
-    conn = sqlite3.connect(DB)
-    c = conn.cursor()
-
-    c.execute("SELECT is_admin FROM users WHERE username=?", (session["user"],))
-    if not c.fetchone()[0]:
-        conn.close()
-        return "Unauthorized"
-
-    c.execute("""
-        SELECT sender_account, receiver_account, amount, reference, status, created_at
-        FROM transactions ORDER BY id DESC
-    """)
-    txns = c.fetchall()
-
+    conn.commit()
     conn.close()
-    return render_template("admin.html", txns=txns)
+
 init_db()
 
-# ---------------- HELPERS ----------------
-def generate_account():
-    return str(random.randint(1000000000, 9999999999))
-
-def generate_reference():
-    return "TXN-" + "".join(random.choices(string.ascii_uppercase + string.digits, k=8))
-
-def generate_otp():
-    return str(random.randint(100000, 999999))
-
 # ---------------- ROUTES ----------------
-
-@app.route("/")
+@app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
 
-# ---------- AUTH ----------
-@app.route("/register", methods=["GET", "POST"])
+@app.route("/register", methods=["GET","POST"])
 def register():
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-        email = request.form["email"]
-
-        account = generate_account()
-
-        conn = sqlite3.connect(DB)
-        c = conn.cursor()
-
-        c.execute(
-            "INSERT INTO users (username, password, email, account_number) VALUES (?,?,?,?)",
-            (username, generate_password_hash(password), email, account)
-        )
-
-        conn.commit()
-        conn.close()
-        return redirect("/login")
-
+        u = request.form["username"]
+        p = generate_password_hash(request.form["password"])
+        email = request.form.get("email")
+        account_number = str(random.randint(1000000000, 9999999999))
+        try:
+            conn = sqlite3.connect(DB)
+            c = conn.cursor()
+            c.execute("INSERT INTO users (username,password,balance,account_number,email) VALUES (?,?,?,?,?)",
+                      (u,p,1000,account_number,email))
+            conn.commit()
+            conn.close()
+            return redirect("/login")
+        except:
+            return "Username already exists"
     return render_template("register.html")
 
-
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["GET","POST"])
 def login():
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+        u = request.form["username"]
+        p = request.form["password"]
 
         conn = sqlite3.connect(DB)
         c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=?", (username,))
+        c.execute("SELECT * FROM users WHERE username=?", (u,))
         user = c.fetchone()
         conn.close()
 
-        if user and check_password_hash(user[2], password):
-            session["user"] = user[1]
+        if user and check_password_hash(user[2], p):
+            session["user"] = u
+            session["admin"] = user[4]
             return redirect("/dashboard")
-
+        return "Invalid login"
     return render_template("login.html")
 
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/")
-
-# ---------- DASHBOARD ----------
 @app.route("/dashboard")
 def dashboard():
     if "user" not in session:
@@ -158,163 +139,101 @@ def dashboard():
 
     conn = sqlite3.connect(DB)
     c = conn.cursor()
+    c.execute("SELECT balance, account_number FROM users WHERE username=?", (session["user"],))
+    balance, account_number = c.fetchone()
 
-    c.execute("SELECT username, balance, account_number FROM users WHERE username=?", (session["user"],))
-    user = c.fetchone()
-
-    c.execute(
-        "SELECT sender_account, receiver_account, amount, reference, status, created_at FROM transactions "
-        "WHERE sender_account=? OR receiver_account=? ORDER BY id DESC",
-        (user[2], user[2])
-    )
-    txns = c.fetchall()
-
-    conn.close()
-    return render_template("dashboard.html", user=user, txns=txns)
-    
-    from fpdf import FPDF
-from flask import send_file
-
-@app.route("/statement")
-def statement():
-    if "user" not in session:
-        return redirect("/login")
-
-    conn = sqlite3.connect(DB)
-    c = conn.cursor()
-
-    c.execute("SELECT account_number FROM users WHERE username=?", (session["user"],))
-    acc = c.fetchone()[0]
-
-    c.execute("""
-        SELECT sender_account, receiver_account, amount, reference, status, created_at
-        FROM transactions
-        WHERE sender_account=? OR receiver_account=?
-    """, (acc, acc))
-    rows = c.fetchall()
-
+    c.execute("SELECT * FROM transactions WHERE sender=? OR receiver=?",
+              (session["user"], session["user"]))
+    tx = c.fetchall()
     conn.close()
 
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=10)
-    pdf.cell(200, 10, f"Scotitrust-Bank Statement", ln=True)
-    pdf.ln(5)
+    return render_template("dashboard.html", balance=balance, account_number=account_number, tx=tx)
 
-    for r in rows:
-        pdf.multi_cell(0, 8,
-            f"{r[5][:19]} | {r[0]} → {r[1]} | ₦{r[2]} | {r[3]} | {r[4]}"
-        )
-
-    filename = f"{acc}_statement.pdf"
-    pdf.output(filename)
-
-    return send_file(filename, as_attachment=True)
-
-
-# ---------- TRANSFER ----------
 @app.route("/transfer", methods=["POST"])
 def transfer():
-    if "user" not in session:
-        return redirect("/login")
-
-    receiver_account = request.form["receiver_account"]
+    sender = session["user"]
+    receiver = request.form["to"]
     amount = float(request.form["amount"])
+    tx_ref = f"TX{random.randint(100000,999999)}"
+    flagged = 1 if amount > 5000 else 0
+    status = "FLAGGED" if amount >= 500000 else "SUCCESS"
 
-status = "FLAGGED" if amount >= 500000 else "SUCCESS"
-
-msg = Message(
-    subject="Transaction Successful",
-    sender=app.config["MAIL_USERNAME"],
-    recipients=[user_email],  # replace with sender's email
-    body=f"Your transfer {tx_ref} was successful."
-)
-mail.send(msg)
     conn = sqlite3.connect(DB)
     c = conn.cursor()
 
-    # sender
-    c.execute("SELECT account_number, balance, email FROM users WHERE username=?", (session["user"],))
-    sender = c.fetchone()
-
-    # receiver
-    c.execute("SELECT account_number FROM users WHERE account_number=?", (receiver_account,))
-    receiver = c.fetchone()
-
-    if not receiver or sender[1] < amount:
+    # Get sender balance
+    c.execute("SELECT balance, email FROM users WHERE username=?", (sender,))
+    bal, user_email = c.fetchone()
+    if bal < amount:
         conn.close()
-        return "Transfer failed", 400
+        return "Insufficient funds"
 
-    reference = generate_reference()
+    # Update balances
+    c.execute("UPDATE users SET balance=balance-? WHERE username=?", (amount,sender))
+    c.execute("UPDATE users SET balance=balance+? WHERE username=?", (amount,receiver))
 
-    c.execute("""INSERT INTO transactions (sender, receiver, amount, flagged, created_at, reference, status)
-             VALUES (?, ?, ?, ?, ?, ?, ?)""", (sender, receiver, amount, flagged, str(datetime.now()), tx_ref, status))
-
-    # generate OTP
-    otp = generate_otp()
-    c.execute(
-        "INSERT INTO otps (reference, otp, created_at) VALUES (?,?,?)",
-        (reference, otp, datetime.now().isoformat())
+    # Insert transaction
+    c.execute("""INSERT INTO transactions 
+        (sender, receiver, amount, flagged, created_at, reference, status)
+        VALUES (?,?,?,?,?,?,?)""",
+        (sender,receiver,amount,flagged,str(datetime.now()),tx_ref,status)
     )
 
     conn.commit()
     conn.close()
 
-    # send OTP email
+    # Send email alert
     msg = Message(
-        subject="Your Transfer OTP",
+        subject="Transaction Successful",
         sender=app.config["MAIL_USERNAME"],
-        recipients=[sender[2]],
-        body=f"Your OTP for transfer {reference} is {otp}"
+        recipients=[user_email],
+        body=f"Your transfer {tx_ref} was successful."
     )
     mail.send(msg)
 
-    return render_template("verify_otp.html", reference=reference)
+    return redirect("/dashboard?transfer=success")
 
-# ---------- VERIFY OTP ----------
-@app.route("/verify-otp", methods=["POST"])
-def verify_otp():
-    reference = request.form["reference"]
-    otp_input = request.form["otp"]
+@app.route("/admin")
+def admin():
+    if not session.get("admin"):
+        return "Unauthorized"
 
     conn = sqlite3.connect(DB)
     c = conn.cursor()
-
-    c.execute("SELECT otp FROM otps WHERE reference=? ORDER BY id DESC LIMIT 1", (reference,))
-    row = c.fetchone()
-
-    if row and row[0] == otp_input:
-        # get transaction
-        c.execute("SELECT sender_account, receiver_account, amount FROM transactions WHERE reference=?", (reference,))
-        txn = c.fetchone()
-
-        # update balances
-        c.execute("UPDATE users SET balance = balance - ? WHERE account_number=?", (txn[2], txn[0]))
-        c.execute("UPDATE users SET balance = balance + ? WHERE account_number=?", (txn[2], txn[1]))
-
-        # mark success
-        c.execute("UPDATE transactions SET status='SUCCESS' WHERE reference=?", (reference,))
-        conn.commit()
-
-        # email confirmation
-        c.execute("SELECT email FROM users WHERE account_number=?", (txn[0],))
-        email = c.fetchone()[0]
-
-        msg = Message(
-            subject="Transaction Successful",
-            sender=app.config["MAIL_USERNAME"],
-            recipients=[email],
-            body=f"Your transfer {reference} was successful."
-        )
-        mail.send(msg)
-
-        conn.close()
-        return redirect("/dashboard")
-
+    c.execute("SELECT * FROM transactions WHERE flagged=1")
+    tx = c.fetchall()
     conn.close()
-    return "Invalid OTP", 400
 
-# Get user balance
+    return render_template("admin.html", tx=tx)
+
+@app.route("/statement")
+def statement():
+    user = session["user"]
+
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+    c.execute("SELECT * FROM transactions WHERE sender=? OR receiver=?", (user,user))
+    rows = c.fetchall()
+    conn.close()
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=10)
+    pdf.cell(200,10,f"Statement for {user}",ln=True)
+
+    for r in rows:
+        pdf.cell(200,8,f"{r[1]} → {r[2]} | {r[3]} | Status:{r[7]} | REF:{r[6]}",ln=True)
+
+    path = f"{user}_statement.pdf"
+    pdf.output(path)
+    return send_file(path, as_attachment=True)
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
+# ---------------- REST API ----------------
 @app.route("/api/balance/<username>", methods=["GET"])
 def api_balance(username):
     conn = sqlite3.connect(DB)
@@ -326,16 +245,16 @@ def api_balance(username):
         return {"username": username, "balance": result[0]}
     return {"error": "User not found"}, 404
 
-# Get transactions
 @app.route("/api/transactions/<username>", methods=["GET"])
 def api_transactions(username):
     conn = sqlite3.connect(DB)
     c = conn.cursor()
-    c.execute("SELECT sender, receiver, amount, flagged, reference, created_at FROM transactions WHERE sender=? OR receiver=?", (username, username))
+    c.execute("SELECT sender, receiver, amount, flagged, reference, created_at, status FROM transactions WHERE sender=? OR receiver=?", (username, username))
     rows = c.fetchall()
     conn.close()
     return {"transactions": rows}
 
-# ---------- RUN ----------
+# ---------------- RUN ----------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
