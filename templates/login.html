@@ -1,17 +1,15 @@
-<h2>Balance: {{ balance }}</h2>
-
-<form action="/transfer" method="post">
-  <input name="to" placeholder="Send to">
-  <input name="amount" placeholder="Amount">
-  <button>Send</button>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<form class="card" method="POST">
+    <h2>Login</h2>
+    <input name="email" type="email" required>
+    <input name="password" type="password" required>
+    <button>Login</button>
 </form>
-
-<a href="/statement">Download PDF Statement</a>
-
-<ul>
-{% for t in tx %}
-<li>{{ t[1] }} → {{ t[2] }} : {{ t[3] }} FLAG:{{ t[4] }}</li>
-{% endfor %}
-</ul>
-
-<a href="/logout">Logout</a>
+</body>
+</html>
