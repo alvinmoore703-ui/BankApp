@@ -1,16 +1,23 @@
-/* General */
-body { 
-    font-family: Arial, sans-serif; 
-    background: #f4f4f4; 
-    margin: 0; 
-    padding: 0; 
+/* ---------------- Mobile-First Responsive Styles ---------------- */
+
+/* General body and layout adjustments */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f8f9fa;
+    color: #333;
 }
 
 header {
-    background: #8B0000; 
+    background: #8B0000; /* dark red */
     color: #fff;
-    padding: 20px;
+    padding: 15px;
     text-align: center;
+}
+
+header nav {
+    margin-top: 10px;
 }
 
 header nav a {
@@ -19,90 +26,103 @@ header nav a {
     text-decoration: none;
 }
 
-/* Hero section */
-.hero {
-    text-align: center;
-    padding: 50px 20px;
-    background: url('../static/hero-bg.jpg') no-repeat center;
-    background-size: cover;
-}
-
-.hero h2 { color: #8B0000; }
-.hero .btn {
-    background: #8B0000;
-    color: #fff;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
-}
-
-/* Cards */
-.card {
-    background: #fff;
-    padding: 20px;
-    margin: 20px auto;
-    width: 300px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-/* Forms */
-.register-form, .transfer {
-    width: 400px;
-    margin: 40px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-.register-form input, .transfer input {
-    width: 90%;
-    padding: 10px;
+h1, h2, h3 {
     margin: 10px 0;
 }
 
-.register-form button, .transfer button {
-    width: 50%;
-    padding: 10px;
+/* Hero / Dashboard Overview */
+.dashboard-overview, .transfer, .transactions, .statement, .admin-transactions {
+    width: 90%;
+    margin: 20px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+/* Buttons */
+button, .btn {
     background: #8B0000;
     color: #fff;
     border: none;
+    padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover, .btn:hover {
+    background: #a00000;
+}
+
+/* Forms */
+input[type=text], input[type=number], input[type=password], input[type=email] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
 
 /* Tables */
 table {
-    width: 90%;
-    margin: 20px auto;
+    width: 100%;
     border-collapse: collapse;
-    background: #fff;
-    border-radius: 10px;
-    overflow: hidden;
+    margin-top: 15px;
 }
 
-table th, table td {
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
     padding: 10px;
     text-align: center;
-    border-bottom: 1px solid #ddd;
+    font-size: 14px;
 }
 
-table th {
+/* Feature cards (if used) */
+.feature-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.feature-card {
+    background: #FFE599;
+    padding: 20px;
+    width: 250px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+/* Footer */
+footer {
     background: #8B0000;
     color: #fff;
+    text-align: center;
+    padding: 15px 0;
+    margin-top: 40px;
+    font-size: 14px;
 }
 
-.admin-transactions tr {
-    background-color: #FFE5E5; /* flagged transactions highlight */
-}
-/* Mobile-first layout */
+/* ---------------- Mobile Adjustments ---------------- */
 @media only screen and (max-width: 768px) {
-    .feature-cards, .transfer, .register-form, table {
-        width: 90% !important;
-        margin: 20px auto;
-        display: block;
+    header img {
+        width: 80px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    .feature-cards, .dashboard-overview, .transfer, .transactions, .admin-transactions {
+        width: 95%;
+        margin: 15px auto;
+        padding: 15px;
     }
 
     table th, table td {
@@ -110,14 +130,13 @@ table th {
         padding: 6px;
     }
 
-    header img {
-        width: 80px;
-    }
-
-    .hero h2 {
-        font-size: 20px;
+    button, .btn {
+        font-size: 12px;
+        padding: 8px 12px;
     }
 }
+
+/* ---------------- Dark Mode ---------------- */
 body.dark-mode {
     background: #121212;
     color: #fff;
@@ -128,8 +147,9 @@ body.dark-mode header, body.dark-mode footer {
     color: #fff;
 }
 
-body.dark-mode .card, body.dark-mode table {
+body.dark-mode .feature-card, body.dark-mode .dashboard-overview, 
+body.dark-mode .transfer, body.dark-mode .transactions, 
+body.dark-mode .admin-transactions {
     background: #1e1e1e;
     color: #fff;
 }
-
