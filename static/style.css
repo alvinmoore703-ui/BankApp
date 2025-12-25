@@ -118,4 +118,18 @@ table th {
         font-size: 20px;
     }
 }
+body.dark-mode {
+    background: #121212;
+    color: #fff;
+}
+
+body.dark-mode header, body.dark-mode footer {
+    background: #1f1f1f;
+    color: #fff;
+}
+
+body.dark-mode .card, body.dark-mode table {
+    background: #1e1e1e;
+    color: #fff;
+}
 
