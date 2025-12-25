@@ -3,77 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scotitrust-Bank Dashboard</title>
+    <title>Scotitrust-Bank | Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: #8B0000; /* dark red */
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        header nav a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 15px;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .account-info {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .account-info h2 {
+            margin-top: 0;
+            color: #8B0000;
+        }
+
+        .account-info p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        table th {
+            background: #8B0000;
+            color: #fff;
+        }
+
+        table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .status-success {
+            color: green;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .status-flagged {
+            color: red;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            header nav {
+                margin-top: 10px;
+            }
+
+            table, table th, table td {
+                font-size: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <header>
+        <h1>Scotitrust-Bank Dashboard</h1>
+        <nav>
+            <a href="/dashboard">Home</a>
+            <a href="/transfer">Transfer</a>
+            <a href="/logout">Logout</a>
+        </nav>
+    </header>
 
-<header>
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Scotitrust-Bank Logo">
-    <nav>
-        <a href="/dashboard">Dashboard</a>
-        <a href="/logout">Logout</a>
-    </nav>
-</header>
+    <div class="container">
+        <div class="account-info">
+            <h2>Account Information</h2>
+            <p><strong>Full Name:</strong> {{ user.full_name }}</p>
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Account Number:</strong> {{ user.account_number }}</p>
+            <p><strong>Balance:</strong> ${{ "%.2f"|format(user.balance) }}</p>
+        </div>
 
-<main class="dashboard">
-    <h1>Welcome, {{ user['full_name'] }}</h1>
-    
-    <section class="account-summary">
-        <div class="card">
-            <h2>Account Number</h2>
-            <p>{{ user['account_number'] }}</p>
-        </div>
-        <div class="card">
-            <h2>Current Balance</h2>
-            <p>${{ "%.2f"|format(user['balance']) }}</p>
-        </div>
-        <div class="card">
-            <h2>Account Type</h2>
-            <p>{{ user['account_type'] if user['account_type'] else 'Standard' }}</p>
-        </div>
-    </section>
-
-    <section class="transactions">
         <h2>Recent Transactions</h2>
-        {% if transactions %}
         <table>
             <thead>
                 <tr>
-                    <th>Reference</th>
+                    <th>Date</th>
                     <th>Sender</th>
                     <th>Receiver</th>
                     <th>Amount</th>
+                    <th>Reference</th>
                     <th>Status</th>
-                    <th>Date</th>
                 </tr>
             </thead>
             <tbody>
-                {% for tx in transactions %}
+                {% for t in transactions %}
                 <tr>
-                    <td>{{ tx['reference'] }}</td>
-                    <td>{{ tx['sender'] }}</td>
-                    <td>{{ tx['receiver'] }}</td>
-                    <td>${{ "%.2f"|format(tx['amount']) }}</td>
-                    <td>{{ tx['status'] }}</td>
-                    <td>{{ tx['created_at'] }}</td>
+                    <td>{{ t.created_at }}</td>
+                    <td>{{ t.sender }}</td>
+                    <td>{{ t.receiver }}</td>
+                    <td>${{ "%.2f"|format(t.amount) }}</td>
+                    <td>{{ t.reference }}</td>
+                    <td>
+                        {% if t.flagged == 1 %}
+                            <span class="status-flagged">FLAGGED</span>
+                        {% elif t.amount >= 500000 %}
+                            <span class="status-pending">PENDING</span>
+                        {% else %}
+                            <span class="status-success">SUCCESS</span>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        {% else %}
-            <p>No transactions yet.</p>
-        {% endif %}
-    </section>
-
-    <section class="actions">
-        <a href="/transfer" class="btn">Make a Transfer</a>
-        <a href="/statement" class="btn">Download Statement (PDF)</a>
-    </section>
-</main>
-
-<footer>
-    &copy; 2025 Scotitrust-Bank | All Rights Reserved
-    </footer>
+    </div>
 </body>
 </html>
+
