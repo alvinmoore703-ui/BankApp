@@ -1,34 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Admin Panel | Scotitrust-Bank</title>
+    <meta charset="UTF-8">
+    <title>Admin Panel - Scotitrust-Bank</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 
-<h2>Admin Dashboard</h2>
+<header>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Scotitrust-Bank Logo" width="100">
+    <h1>Scotitrust-Bank Admin Panel</h1>
+    <nav>
+        <a href="/dashboard">Dashboard</a> |
+        <a href="/logout">Logout</a>
+    </nav>
+</header>
 
-<table>
-    <tr>
-        <th>Sender</th>
-        <th>Receiver</th>
-        <th>Amount</th>
-        <th>Reference</th>
-        <th>Status</th>
-        <th>Date</th>
-    </tr>
+<section class="admin-transactions">
+    <h2>Flagged Transactions</h2>
+    {% if tx %}
+    <table>
+        <thead>
+            <tr>
+                <th>Sender</th>
+                <th>Receiver</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Reference</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in tx %}
+            <tr style="background-color:#FFE5E5;"> <!-- Light red highlight for flagged -->
+                <td>{{ t[1] }}</td>
+                <td>{{ t[2] }}</td>
+                <td>${{ t[3] }}</td>
+                <td>{{ t[7] }}</td>
+                <td>{{ t[6] }}</td>
+                <td>{{ t[5] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No flagged transactions at the moment.</p>
+    {% endif %}
+</section>
 
-    {% for t in txns %}
-    <tr class="{{ 'flagged' if t[4]=='FLAGGED' }}">
-        <td>{{ t[0] }}</td>
-        <td>{{ t[1] }}</td>
-        <td>₦{{ t[2] }}</td>
-        <td>{{ t[3] }}</td>
-        <td>{{ t[4] }}</td>
-        <td>{{ t[5][:19] }}</td>
-    </tr>
-    {% endfor %}
-</table>
+<footer>
+    <p>© 2025 Scotitrust-Bank. All rights reserved.</p>
+</footer>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
 </html>
