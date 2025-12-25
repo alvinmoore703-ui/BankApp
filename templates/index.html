@@ -1,21 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Scotitrust Bank</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8">
+  <title>Scotitrust Bank</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/static/style.css">
 </head>
-<body class="light">
-<header>
-    <img src="/static/logo.png">
-    <nav>
-        <a href="/login">Login</a>
-        <a href="/register" class="btn">Open Account</a>
-    </nav>
+<body>
+
+<header class="top-nav">
+  <div class="logo">
+    <img src="/static/logo.png" alt="Scotitrust Bank">
+  </div>
+
+  <nav class="nav-links">
+    <a href="#">Personal</a>
+    <a href="#">Business</a>
+    <a href="#">Private Banking</a>
+  </nav>
+
+  <div class="nav-actions">
+    <a href="/login" class="login-btn">Log in</a>
+    <span class="menu">☰</span>
+  </div>
 </header>
 
 <section class="hero">
-    <h1>Secure. Trusted. Global Banking.</h1>
-    <p>Welcome to Scotitrust Bank</p>
+  <h1>Protect your holiday vibes</h1>
+  <p>European travel insurance and no card fees abroad included with our Silver Account.</p>
+  <a class="primary-btn" href="/register">Explore our Silver Account</a>
+  <small>£11.50 monthly fee · T&Cs apply</small>
 </section>
+
+<section class="app-promo">
+  <h2>Your bank in your pocket</h2>
+  <p>Join customers who manage their money safely with our mobile app.</p>
+
+  <ul>
+    <li>✔ Secure login & OTP protection</li>
+    <li>✔ Instant transfers</li>
+    <li>✔ Card freeze & alerts</li>
+  </ul>
+
+  <a href="#" class="secondary-btn">More about the app</a>
+</section>
+
+<section class="products">
+  <div class="product-card">
+    <h3>Savings</h3>
+    <p>Accounts to help you reach your goals.</p>
+  </div>
+  <div class="product-card">
+    <h3>Investing</h3>
+    <p>Ready-made investments from £50/month.</p>
+  </div>
+  <div class="product-card">
+    <h3>Loans</h3>
+    <p>Check what you could borrow in minutes.</p>
+  </div>
+  <div class="product-card">
+    <h3>Insurance</h3>
+    <p>Bronze, Silver & Gold protection plans.</p>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 Scotitrust Bank · Regulated · Secure · Trusted</p>
+</footer>
+
 </body>
 </html>
