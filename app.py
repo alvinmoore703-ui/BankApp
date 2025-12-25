@@ -62,18 +62,27 @@ def init_db():
     )
     """)
 
-    # DEFAULT ADMIN
-    c.execute("SELECT * FROM users WHERE username='admin'")
-    if not c.fetchone():
-        admin_account = str(random.randint(1000000000, 9999999999))
-        c.execute(
-            "INSERT INTO users (username, password, email, is_admin, account_number, balance) VALUES (?,?,?,?,?,?)",
-            ("admin", generate_password_hash("admin123"), "admin@bank.com", 1, admin_account, 1000000)
-        )
+    @app.route("/admin")
+def admin():
+    if "user" not in session:
+        return redirect("/login")
 
-    conn.commit()
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+
+    c.execute("SELECT is_admin FROM users WHERE username=?", (session["user"],))
+    if not c.fetchone()[0]:
+        conn.close()
+        return "Unauthorized"
+
+    c.execute("""
+        SELECT sender_account, receiver_account, amount, reference, status, created_at
+        FROM transactions ORDER BY id DESC
+    """)
+    txns = c.fetchall()
+
     conn.close()
-
+    return render_template("admin.html", txns=txns)
 init_db()
 
 # ---------------- HELPERS ----------------
