@@ -121,3 +121,29 @@ def verify_otp():
         return "Invalid OTP. Please try again."
 
     return render_template("verify_otp.html", reference=reference, username=username)
+    
+# ---------------- LOGIN ----------------
+@app.route("/login", methods=["GET","POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        conn = sqlite3.connect(DB)
+        c = conn.cursor()
+        c.execute("SELECT * FROM users WHERE username=?", (username,))
+        user = c.fetchone()
+        conn.close()
+
+        if user:
+            if not user[7]:  # verified column index
+                return "Your account is not verified. Please check your email for the OTP."
+
+            if check_password_hash(user[2], password):
+                session["user"] = username
+                session["admin"] = user[4]
+                return redirect("/dashboard")
+
+        return "Invalid username or password"
+
+    return render_template("login.html")
