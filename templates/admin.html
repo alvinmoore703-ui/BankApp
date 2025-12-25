@@ -1,40 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin | Scotitrust-Bank</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>Admin Panel | Scotitrust-Bank</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<header class="nav">
-    <h1>Compliance Dashboard</h1>
-    <a href="/logout">Logout</a>
-</header>
+<h2>Admin Dashboard</h2>
 
-<section class="dashboard">
+<table>
+    <tr>
+        <th>Sender</th>
+        <th>Receiver</th>
+        <th>Amount</th>
+        <th>Reference</th>
+        <th>Status</th>
+        <th>Date</th>
+    </tr>
 
-<div class="card">
-    <h2>Flagged Transactions</h2>
-    <table>
-        <tr>
-            <th>Date</th>
-            <th>Sender</th>
-            <th>Receiver</th>
-            <th>Amount</th>
-            <th>Ref</th>
-        </tr>
-        {% for t in tx %}
-        <tr>
-            <td>{{ t[5][:16] }}</td>
-            <td>{{ t[1] }}</td>
-            <td>{{ t[2] }}</td>
-            <td>₦{{ t[3] }}</td>
-            <td>{{ t[6] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
+    {% for t in txns %}
+    <tr class="{{ 'flagged' if t[4]=='FLAGGED' }}">
+        <td>{{ t[0] }}</td>
+        <td>{{ t[1] }}</td>
+        <td>₦{{ t[2] }}</td>
+        <td>{{ t[3] }}</td>
+        <td>{{ t[4] }}</td>
+        <td>{{ t[5][:19] }}</td>
+    </tr>
+    {% endfor %}
+</table>
 
-</section>
 </body>
 </html>
