@@ -15,7 +15,25 @@ app.config.update(
     MAIL_USE_TLS=True,
     MAIL_USERNAME="your_email@gmail.com",
     MAIL_PASSWORD="your_password"
-)
+)from flask import Flask, render_template, request, redirect, session, send_file
+import sqlite3, random, os
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+from fpdf import FPDF
+from flask_mail import Mail, Message
+
+app = Flask(__name__)
+app.secret_key = "super-secret-key"
+
+# ---------------- MAIL CONFIG (Render-safe) ----------------
+app.config["MAIL_SERVER"] = "smtp.gmail.com"
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USE_TLS"] = True
+
+# ⬇️ PUT THESE TWO LINES HERE ⬇️
+app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
+
 mail = Mail(app)
 
 DB = "bank.db"
