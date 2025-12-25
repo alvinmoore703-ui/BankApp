@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify OTP - Scotitrust-Bank</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<header>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Scotitrust-Bank Logo" width="100">
+    <h1>Verify Your Account</h1>
+</header>
+
+<section class="otp-verification">
+    <p>Hi {{ username }}, enter the OTP sent to your email to complete registration.</p>
+    <form method="POST" action="/verify_otp?ref={{ reference }}&user={{ username }}">
+        <input type="text" name="otp" placeholder="Enter OTP" required>
+        <button type="submit">Verify</button>
+    </form>
+</section>
+
+<footer>
+    <p>© 2025 Scotitrust-Bank. All rights reserved.</p>
+</footer>
+
+</body>
+</html>
