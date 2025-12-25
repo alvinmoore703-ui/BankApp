@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Transfer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Scotitrust-Bank</h1>
+        <nav>
+            <a href="/dashboard">Dashboard</a> |
+            <a href="/logout">Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>Confirm Transfer</h2>
+        <p>Transfer <strong>${{ "%.2f"|format(amount) }}</strong> to account <strong>{{ receiver }}</strong></p>
+        {% if message %}
+            <p style="color:red;">{{ message }}</p>
+        {% endif %}
+        <form method="POST">
+            <label>Enter OTP sent to your email:</label><br>
+            <input type="text" name="otp" required><br><br>
+            <button type="submit">Confirm Transfer</button>
+        </form>
+    </div>
+</body>
+</html>
