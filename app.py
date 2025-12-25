@@ -171,6 +171,46 @@ def dashboard():
 
     conn.close()
     return render_template("dashboard.html", user=user, txns=txns)
+    
+    from fpdf import FPDF
+from flask import send_file
+
+@app.route("/statement")
+def statement():
+    if "user" not in session:
+        return redirect("/login")
+
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+
+    c.execute("SELECT account_number FROM users WHERE username=?", (session["user"],))
+    acc = c.fetchone()[0]
+
+    c.execute("""
+        SELECT sender_account, receiver_account, amount, reference, status, created_at
+        FROM transactions
+        WHERE sender_account=? OR receiver_account=?
+    """, (acc, acc))
+    rows = c.fetchall()
+
+    conn.close()
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=10)
+    pdf.cell(200, 10, f"Scotitrust-Bank Statement", ln=True)
+    pdf.ln(5)
+
+    for r in rows:
+        pdf.multi_cell(0, 8,
+            f"{r[5][:19]} | {r[0]} → {r[1]} | ₦{r[2]} | {r[3]} | {r[4]}"
+        )
+
+    filename = f"{acc}_statement.pdf"
+    pdf.output(filename)
+
+    return send_file(filename, as_attachment=True)
+
 
 # ---------- TRANSFER ----------
 @app.route("/transfer", methods=["POST"])
