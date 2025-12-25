@@ -97,3 +97,25 @@ table th {
 .admin-transactions tr {
     background-color: #FFE5E5; /* flagged transactions highlight */
 }
+/* Mobile-first layout */
+@media only screen and (max-width: 768px) {
+    .feature-cards, .transfer, .register-form, table {
+        width: 90% !important;
+        margin: 20px auto;
+        display: block;
+    }
+
+    table th, table td {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    header img {
+        width: 80px;
+    }
+
+    .hero h2 {
+        font-size: 20px;
+    }
+}
+
