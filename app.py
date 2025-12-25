@@ -318,6 +318,27 @@ def verify_otp():
     conn.close()
     return "Invalid OTP", 400
 
+# Get user balance
+@app.route("/api/balance/<username>", methods=["GET"])
+def api_balance(username):
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+    c.execute("SELECT balance FROM users WHERE username=?", (username,))
+    result = c.fetchone()
+    conn.close()
+    if result:
+        return {"username": username, "balance": result[0]}
+    return {"error": "User not found"}, 404
+
+# Get transactions
+@app.route("/api/transactions/<username>", methods=["GET"])
+def api_transactions(username):
+    conn = sqlite3.connect(DB)
+    c = conn.cursor()
+    c.execute("SELECT sender, receiver, amount, flagged, reference, created_at FROM transactions WHERE sender=? OR receiver=?", (username, username))
+    rows = c.fetchall()
+    conn.close()
+    return {"transactions": rows}
 
 # ---------- RUN ----------
 if __name__ == "__main__":
