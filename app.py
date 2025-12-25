@@ -8,6 +8,15 @@ from datetime import datetime
 from fpdf import FPDF
 from flask_mail import Mail, Message
 
+app.secret_key = "super-secret-key"
+
+# Mail config (uses Render Environment Variables)
+app.config["MAIL_SERVER"] = "smtp.gmail.com"
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
+
 @app.route("/")
 def home():
     return "Scotitrust Bank OK"
