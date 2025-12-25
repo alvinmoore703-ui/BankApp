@@ -94,23 +94,52 @@ init_db()
 def index():
     return render_template("index.html")
 
-@app.route("/register", methods=["GET","POST"])
+@app@app.route("/register", methods=["GET","POST"])
 def register():
     if request.method == "POST":
-        u = request.form["username"]
-        p = generate_password_hash(request.form["password"])
-        email = request.form.get("email")
-        account_number = str(random.randint(1000000000, 9999999999))
+        import random
+        from flask_mail import Message
+
+        username = request.form["username"]
+        password = generate_password_hash(request.form["password"])
+        email = request.form["email"]
+        account_number = str(random.randint(1000000000, 9999999999))  # 10-digit account
+
         try:
             conn = sqlite3.connect(DB)
             c = conn.cursor()
-            c.execute("INSERT INTO users (username,password,balance,account_number,email) VALUES (?,?,?,?,?)",
-                      (u,p,1000,account_number,email))
+            # Insert user with balance 1000
+            c.execute(
+                "INSERT INTO users (username,password,balance,account_number,email) VALUES (?,?,?,?,?)",
+                (username, password, 1000, account_number, email)
+            )
+            conn.commit()
+
+            # Generate OTP
+            otp_code = str(random.randint(100000, 999999))
+            reference = f"REG-{random.randint(100000,999999)}"
+            c.execute(
+                "INSERT INTO otps (reference, otp, created_at) VALUES (?,?,?)",
+                (reference, otp_code, str(datetime.now()))
+            )
             conn.commit()
             conn.close()
-            return redirect("/login")
-        except:
-            return "Username already exists"
+
+            # Send OTP email
+            msg = Message(
+                subject="Verify Your Scotitrust-Bank Account",
+                sender=app.config["MAIL_USERNAME"],
+                recipients=[email],
+                body=f"Welcome {username}! Your OTP to verify your account is: {otp_code}"
+            )
+            mail.send(msg)
+
+            # Redirect to OTP verification page
+            return redirect(f"/verify_otp?ref={reference}&user={username}")
+
+        except sqlite3.IntegrityError:
+            return "Username already exists or account number collision"
+
     return render_template("register.html")
 
 @app.route("/login", methods=["GET","POST"])
