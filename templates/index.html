@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <title>Scotitrust-Bank</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 
-<!-- Header -->
 <header>
     <img src="{{ url_for('static', filename='logo.png') }}" alt="Scotitrust-Bank Logo" width="120">
     <h1>Scotitrust-Bank</h1>
@@ -17,41 +17,32 @@
     </nav>
 </header>
 
-<!-- Hero Section -->
 <section class="hero">
     <h2>Your trusted fintech bank</h2>
     <p>Fast, secure, and easy-to-use banking at your fingertips.</p>
     <a class="btn" href="/register">Get Started</a>
 </section>
 
-<!-- Features Section -->
 <section class="features">
-    <h2>Why Choose Scotitrust-Bank?</h2>
     <div class="feature-cards">
         <div class="feature-card">
-            <h3>Secure Accounts</h3>
-            <p>All accounts are protected with bank-grade encryption and secure login.</p>
+            <h3>Secure Transactions</h3>
+            <p>All transfers are encrypted and verified.</p>
         </div>
         <div class="feature-card">
-            <h3>Instant Transfers</h3>
-            <p>Send and receive money quickly with unique transaction references.</p>
+            <h3>Mobile Banking</h3>
+            <p>Access your account anywhere on any device.</p>
         </div>
         <div class="feature-card">
-            <h3>Download Statements</h3>
-            <p>Get your account statements in PDF format anytime.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Admin Oversight</h3>
-            <p>Flagged transactions are monitored to keep your account safe.</p>
+            <h3>24/7 Support</h3>
+            <p>Our team is always ready to assist you.</p>
         </div>
     </div>
 </section>
 
-<!-- Footer -->
 <footer>
     <p>© 2025 Scotitrust-Bank. All rights reserved.</p>
 </footer>
 
-<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
