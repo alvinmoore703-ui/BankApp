@@ -1,36 +1,98 @@
+/* Global Styles */
 body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    padding: 20px;
-    background: #f4f4f6;
-    color: #2c3e50;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f9f9f9;
+    color: #1b1b1b;
 }
 
+/* Header */
 header {
-    text-align: center;
-    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 50px;
+    background-color: #8B0000; /* dark red */
+    color: white;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
 }
 
-header h1 {
-    color: #8B0000;
+header img {
+    height: 50px;
 }
 
-form {
+header nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: bold;
+}
+
+header nav a:hover {
+    text-decoration: underline;
+}
+
+/* Hero Section */
+.hero {
     display: flex;
     flex-direction: column;
-    max-width: 400px;
-    margin: auto;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+    background: linear-gradient(135deg, #8B0000 0%, #FFD700 100%);
+    color: white;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.hero h2 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+.hero .btn {
+    padding: 15px 30px;
+    background: white;
+    color: #8B0000;
+    font-weight: bold;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.hero .btn:hover {
+    background: #ffd700;
+    color: #1b1b1b;
+}
+
+/* Form */
+form {
+    max-width: 450px;
+    margin: 40px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 input, button {
-    margin: 10px 0;
-    padding: 10px;
+    padding: 12px;
     font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
 }
 
 button {
     background: #8B0000;
     color: white;
     border: none;
+    font-weight: bold;
     cursor: pointer;
 }
 
@@ -38,9 +100,12 @@ button:hover {
     background: #a00000;
 }
 
+/* Footer */
 footer {
     text-align: center;
-    margin-top: 40px;
-    color: #888;
+    padding: 15px 0;
+    background: #1b1b1b;
+    color: white;
     font-size: 14px;
+    margin-top: 50px;
 }
