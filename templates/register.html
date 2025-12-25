@@ -1,22 +1,35 @@
-@app.route("/register", methods=["GET","POST"])
-def register():
-    if request.method == "POST":
-        import random
-        u = request.form["username"]
-        p = generate_password_hash(request.form["password"])
-        account_number = str(random.randint(1000000000, 9999999999))  # 10-digit account
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - Scotitrust-Bank</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
 
-        try:
-            conn = sqlite3.connect(DB)
-            c = conn.cursor()
-            c.execute(
-                "INSERT INTO users (username,password,balance,account_number) VALUES (?,?,1000,?)",
-                (u,p,account_number)
-            )
-            conn.commit()
-            conn.close()
-            return redirect("/login")
-        except sqlite3.IntegrityError:
-            return "Username already exists or account number collision"
+<header>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Scotitrust-Bank Logo" width="100">
+    <h1>Scotitrust-Bank Registration</h1>
+    <nav>
+        <a href="/">Home</a> |
+        <a href="/login">Login</a>
+    </nav>
+</header>
 
-    return render_template("register.html")
+<section class="register">
+    <h2>Create Your Account</h2>
+    <form method="POST" action="/register">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Register</button>
+    </form>
+</section>
+
+<footer>
+    <p>© 2025 Scotitrust-Bank. All rights reserved.</p>
+</footer>
+
+</body>
+</html>
