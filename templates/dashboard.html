@@ -1,101 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scotitrust-Bank | Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-            margin: 0;
-            padding: 0;
-        }
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="dark">
+<button onclick="toggle()">Toggle Theme</button>
 
-        header {
-            background: #8B0000; /* dark red */
-            color: #fff;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+<div class="card">
+    <h2>Welcome {{ user.fullname }}</h2>
+    <p>Account Number: {{ user.account }}</p>
+    <p>Balance: ${{ user.balance }}</p>
+    <a href="/logout">Logout</a>
+</div>
 
-        header h1 {
-            margin: 0;
-            font-size: 22px;
-        }
+<script>
+function toggle(){
+    document.body.classList.toggle("dark");
+}
+</script>
+</body>
+</html>
 
-        header nav a {
-            color: #fff;
-            text-decoration: none;
-            margin-left: 15px;
-            font-weight: bold;
-        }
-
-        .container {
-            padding: 20px;
-            max-width: 1200px;
-            margin: auto;
-        }
-
-        .account-info {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-
-        .account-info h2 {
-            margin-top: 0;
-            color: #8B0000;
-        }
-
-        .account-info p {
-            font-size: 16px;
-            margin: 5px 0;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-
-        table th, table td {
-            padding: 12px 15px;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        table th {
-            background: #8B0000;
-            color: #fff;
-        }
-
-        table tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-
-        .status-success {
-            color: green;
-            font-weight: bold;
-        }
-
-        .status-pending {
-            color: orange;
-            font-weight: bold;
-        }
-
-        .status-flagged {
-            color: red;
-            font-weight: bold;
-        }
 
         @media (max-width: 768px) {
             header {
