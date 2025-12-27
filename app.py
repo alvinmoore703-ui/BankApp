@@ -3,7 +3,7 @@ from flask_mail import Mail, Message
 import os, random
 
 app = Flask(__name__)
-app.secret_key = "super-secret-key"
+app.secret_key = os.environ.get("SECRET_KEY", "super-secret-key")
 
 # ================= MAIL CONFIG =================
 app.config["MAIL_SERVER"] = "smtp.gmail.com"
@@ -15,7 +15,7 @@ app.config["MAIL_DEFAULT_SENDER"] = app.config["MAIL_USERNAME"]
 
 mail = Mail(app)
 
-# ================= FAKE DATABASE =================
+# ================= TEMP DATABASE (IN-MEMORY) =================
 users = {}
 
 # ================= HOME =================
@@ -31,9 +31,14 @@ def register():
         email = request.form["email"]
         password = request.form["password"]
         confirm = request.form["confirm"]
+        account_type = request.form["account_type"]
 
         if password != confirm:
             flash("Passwords do not match")
+            return redirect(url_for("register"))
+
+        if email in users:
+            flash("Email already registered")
             return redirect(url_for("register"))
 
         account_number = "30" + str(random.randint(10000000, 99999999))
@@ -45,40 +50,38 @@ def register():
             "account": account_number,
             "balance": 10000,
             "otp": otp,
-            "verified": False
+            "verified": True,
+            "type": account_type
         }
 
         msg = Message("Scotitrust Bank OTP", recipients=[email])
-        msg.body = f"Your OTP is {otp}"
+        msg.body = f"Your verification code is: {otp}"
         mail.send(msg)
 
         session["verify_email"] = email
-        return redirect(url_for("verify_otp"))
+        return redirect(url_for("verify"))
 
     return render_template("register.html")
 
-# ================= OTP =================
+# ================= OTP VERIFY =================
 @app.route("/verify", methods=["GET", "POST"])
-def verify_otp():
+def verify():
     email = session.get("verify_email")
+
+    if not email:
+        return redirect(url_for("register"))
 
     if request.method == "POST":
         otp = request.form["otp"]
 
         if users[email]["otp"] == otp:
             users[email]["verified"] = True
-            flash("Account verified successfully")
+            flash("Account verified. Please log in.")
             return redirect(url_for("login"))
         else:
             flash("Invalid OTP")
 
-    return """
-    <form method="POST" style="text-align:center;margin-top:50px">
-        <h2>Enter OTP</h2>
-        <input name="otp" required>
-        <button>Verify</button>
-    </form>
-    """
+    return render_template("verify.html")
 
 # ================= LOGIN =================
 @app.route("/login", methods=["GET", "POST"])
@@ -88,22 +91,50 @@ def login():
         password = request.form["password"]
 
         user = users.get(email)
+
         if not user or user["password"] != password:
-            flash("Invalid login")
+            flash("Invalid email or password")
+            return redirect(url_for("login"))
+
+        if not user["verified"]:
+            flash("Please verify your account first")
             return redirect(url_for("login"))
 
         session["user"] = email
-        return redirect(url_for("dashboard"))
+
+        # redirect by account type
+        if user["type"] == "personal":
+            return redirect(url_for("personal"))
+        elif user["type"] == "business":
+            return redirect(url_for("business"))
+        else:
+            return redirect(url_for("private"))
 
     return render_template("login.html")
 
-# ================= DASHBOARD =================
-@app.route("/dashboard")
-def dashboard():
+# ================= DASHBOARDS =================
+@app.route("/personal")
+def personal():
+    return render_dashboard("personal")
+
+@app.route("/business")
+def business():
+    return render_dashboard("business")
+
+@app.route("/private")
+def private():
+    return render_dashboard("private")
+
+def render_dashboard(required_type):
     if "user" not in session:
         return redirect(url_for("login"))
 
     user = users[session["user"]]
+
+    if user["type"] != required_type:
+        flash("Access denied")
+        return redirect(url_for("home"))
+
     return render_template("dashboard.html", user=user)
 
 # ================= LOGOUT =================
