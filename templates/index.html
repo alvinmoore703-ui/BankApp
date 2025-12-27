@@ -1,69 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Scotitrust Bank</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scotitrust Bank</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<header class="bottom-nav">
-  <div class="logo">
-    <img src="/static/logo.png" alt="Scotitrust Bank">
-    
-  </div>
-<nav class="bank-nav">
-  <a href="/personal">Personal</a>
-  <a href="/business">Business</a>
-  <a href="/private">Private Banking</a>
-</nav>
+    <header>
+        <div class="logo">Scotitrust Bank</div>
+        <nav>
+            <ul>
+                <li><a href="#">Personal</a></li>
+                <li><a href="#">Business</a></li>
+                <li><a href="#">Private Banking</a></li>
+            </ul>
+            <a class="btn" href="{{ url_for('login') }}">Log In</a>
+            <a class="btn btn-primary" href="{{ url_for('register') }}">Register</a>
+        </nav>
+    </header>
 
-  <div class="nav-actions">
-    <a href="/login" class="login-btn">Log in</a>
-    <span class="menu">☰</span>
-  </div>
-</header>
+    <section class="hero">
+        <div class="hero-text">
+            <h1>Your bank in your pocket</h1>
+            <p>Join the 1 million customers using our secure, highly rated mobile app.</p>
+            <a class="btn btn-primary" href="{{ url_for('register') }}">Open an Account</a>
+        </div>
+        <div class="hero-image">
+            <img src="{{ url_for('static', filename='hero.png') }}" alt="Bank app illustration">
+        </div>
+    </section>
 
-<section class="hero">
-  <h1>Protect your holiday vibes</h1>
-  <p>European travel insurance and no card fees abroad included with our Silver Account.</p>
-  <a class="primary-btn" href="/register">Explore our Silver Account</a>
-  <small>£11.50 monthly fee · T&Cs apply</small>
-</section>
+    <section class="features">
+        <div class="feature">
+            <h3>Savings</h3>
+            <p>Choose the right savings account for your goals.</p>
+        </div>
+        <div class="feature">
+            <h3>Investments</h3>
+            <p>Easy ready-made investments from just £50/month.</p>
+        </div>
+        <div class="feature">
+            <h3>Credit Cards</h3>
+            <p>Check eligibility before applying with no credit score impact.</p>
+        </div>
+        <div class="feature">
+            <h3>Loans & Mortgages</h3>
+            <p>Personalized rates based on your circumstances.</p>
+        </div>
+    </section>
 
-<section class="app-promo">
-  <h2>Your bank in your pocket</h2>
-  <p>Join customers who manage their money safely with our mobile app.</p>
-
-  <ul>
-    <li>✔ Secure login & OTP protection</li>  <li>✔ Instant transfers</li> <li>✔ Card freeze & alerts</li> </ul>
-
-  <a href="#" class="secondary-btn">More about the app</a>
-</section>
-
-<section class="products">
-  <div class="product-card">
-    <h3>Savings</h3>
-    <p>Accounts to help you reach your goals.</p>
-  </div>
-  <div class="product-card">
-    <h3>Investing</h3>
-    <p>Ready-made investments from £50/month.</p>
-  </div>
-  <div class="product-card">
-    <h3>Loans</h3>
-    <p>Check what you could borrow in minutes.</p>
-  </div>
-  <div class="product-card">
-    <h3>Insurance</h3>
-    <p>Bronze, Silver & Gold protection plans.</p>
-  </div>
-</section>
-
-<footer>
-  <p>© 2025 Scotitrust Bank · Regulated · Secure · Trusted</p>
-</footer>
-
+    <footer>
+        <p>Scotitrust Bank © 2025 | All rights reserved</p>
+    </footer>
 </body>
-  
 </html>
