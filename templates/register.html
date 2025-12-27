@@ -1,32 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Scotitrust Bank</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<form class="card" method="POST">
-    <h2>Open an Account</h2>
-    <input name="fullname" placeholder="Full Name" required>
-    <input name="email" type="email" placeholder="Email" required>
-    <input name="password" type="password" placeholder="Password" required>
-    <input name="confirm" type="password" placeholder="Confirm Password" required>
-    <button>Create Account</button>
-</form>
-</body>
-</html>
-ust-Bank Account</h2>
-        <form action="/register" method="POST">
-            <input type="text" name="full_name" placeholder="Full Name" required>
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="email" name="email" placeholder="Email Address" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-            <button type="submit">Register</button>
+    <header>
+        <div class="logo">Scotitrust Bank</div>
+        <nav>
+            <a class="btn" href="{{ url_for('login') }}">Login</a>
+            <a class="btn btn-primary" href="{{ url_for('home') }}">Home</a>
+        </nav>
+    </header>
+
+    <section class="register-section">
+        <h2>Create Your Account</h2>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flash-messages">
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('register') }}">
+            <div class="form-group">
+                <label for="fullname">Full Name</label>
+                <input type="text" name="fullname" id="fullname" placeholder="John Doe" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" placeholder="you@example.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" placeholder="Enter password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm">Confirm Password</label>
+                <input type="password" name="confirm" id="confirm" placeholder="Confirm password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Register</button>
         </form>
-        <div class="login-link">
-            Already have an account? <a href="/login">Login</a>
-        </div>
-    </div>
+
+        <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+    </section>
 </body>
 </html>
