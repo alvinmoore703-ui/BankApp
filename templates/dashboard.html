@@ -1,47 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/static/dashboard.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - {{ user.fullname }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <header>
+        <div class="logo">Scotitrust Bank</div>
+        <nav>
+            <a class="btn" href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
 
-<header class="dash-header">
-  <h2>Welcome, {{ user.full_name }}</h2>
-  <span class="account-type">{{ user.account_type }}</span>
-</header>
+    <section class="account-overview">
+        <h2>Welcome, {{ user.fullname }}</h2>
+        <p>Account Number: {{ user.account }}</p>
+        <p>Balance: £{{ user.balance }}</p>
+    </section>
 
-<section class="balance-card">
-  <p>Available balance</p>
-  <h1>£{{ user.balance }}</h1>
-  <small>Account No: {{ user.account_number }}</small>
-</section>
+    <section class="bank-types">
+        <button class="tab-btn active" data-tab="personal">Personal</button>
+        <button class="tab-btn" data-tab="business">Business</button>
+        <button class="tab-btn" data-tab="private">Private Banking</button>
+    </section>
 
-<section class="actions">
-  <a href="#">Send Money</a>
-  <a href="#">Transactions</a>
-  <a href="#">Statements</a>
-  <a href="#">Freeze Card</a>
-</section>
+    <section class="tab-content">
+        <div id="personal" class="tab active">
+            <h3>Personal Account</h3>
+            <p>View your personal transactions and details here.</p>
+        </div>
+        <div id="business" class="tab">
+            <h3>Business Account</h3>
+            <p>Manage business transactions and invoices.</p>
+        </div>
+        <div id="private" class="tab">
+            <h3>Private Banking</h3>
+            <p>Exclusive services for private banking clients.</p>
+        </div>
+    </section>
 
-<section class="transactions">
-  <h3>Recent activity</h3>
-  {% for tx in transactions %}
-    <div class="tx">
-      <span>{{ tx.reference }}</span>
-      <span>{{ tx.status }}</span>
-      <span>£{{ tx.amount }}</span>
-    </div>
-  {% endfor %}
-</section>
+    <script>
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab');
 
-<nav class="bottom-nav">
-  <a>Home</a>
-  <a>Payments</a>
-  <a>Cards</a>
-  <a>Support</a>
-</nav>
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
 
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>
