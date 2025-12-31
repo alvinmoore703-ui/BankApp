@@ -1,91 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Register | Scotitrust Bank</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-      background: #f5f7fb;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 420px;
-      margin: 40px auto;
-      background: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 12px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-    button {
-      background: #0047ab;
-      color: white;
-      border: none;
-      font-weight: bold;
-    }
-    button:hover {
-      opacity: 0.9;
-    }
-  </style>
-</head>
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        fullname = request.form.get("fullname")
+        email = request.form.get("email")
+        password = request.form.get("password")
+        confirm = request.form.get("confirm")
+        account_type = request.form.get("account_type")
 
-<body>
-  <div class="container">
-    <h2>Create Account</h2>
+        if password != confirm:
+            flash("Passwords do not match")
+            return redirect(url_for("register"))
 
-    <form method="POST" action="/register">
+        account_number = "30" + str(random.randint(10000000, 99999999))
+        otp = str(random.randint(100000, 999999))
 
-      <input
-        type="text"
-        name="fullname"
-        placeholder="Full name"
-        required
-      >
+        users[email] = {
+            "fullname": fullname,
+            "password": password,
+            "account": account_number,
+            "balance": 10000,
+            "otp": otp,
+            "verified": False,
+            "type": account_type
+        }
 
-      <input
-        type="email"
-        name="email"
-        placeholder="Email address"
-        required
-      >
+        # ✅ SAFE EMAIL SEND (NO FREEZE)
+        try:
+            msg = Message(
+                "Scotitrust Bank OTP",
+                recipients=[email]
+            )
+            msg.body = f"Your OTP is {otp}"
+            mail.send(msg)
+        except Exception as e:
+            print("MAIL ERROR:", e)
 
-      <select name="account_type" required>
-        <option value="">Select account type</option>
-        <option value="Personal">Personal Banking</option>
-        <option value="Business">Business Banking</option>
-        <option value="Private">Private Banking</option>
-      </select>
+        session["verify_email"] = email
+        return redirect(url_for("verify_otp"))
 
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        required
-      >
-
-      <input
-        type="password"
-        name="confirm"
-        placeholder="Confirm password"
-        required
-      >
-
-      <button type="submit">Create Account</button>
-    </form>
-  </div>
-</body>
-</html>
+    return render_template("register.html")
